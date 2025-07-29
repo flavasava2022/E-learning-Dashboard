@@ -44,10 +44,10 @@ export default function InstructorsFilter() {
     const fetchInstructorsName = async () => {
       try {
         const { data, error } = await supabase
-          .from("courses")
+          .from("users")
 
-          .select("*")
-          .eq("published", "true");
+          .select("id,first_name,last_name")
+          .eq("role", "instructor");
 
         if (error) throw error;
         if (data) {
@@ -64,10 +64,7 @@ export default function InstructorsFilter() {
     const checkedValues = searchParams.getAll("instructor");
     const checkBoxes = {};
     items.forEach(
-      (item) =>
-        (checkBoxes[item.instructor_name] = checkedValues.includes(
-          item.instructor_name
-        ))
+      (item) => (checkBoxes[item.id] = checkedValues.includes(item.id))
     );
     setChecked(checkBoxes);
   }, [items, searchParams]);
@@ -87,12 +84,12 @@ export default function InstructorsFilter() {
               key={item?.id}
               control={
                 <Checkbox
-                  checked={!!checked[item.instructor_name]}
+                  checked={!!checked[item.id]}
                   onChange={handleChange}
-                  name={item.instructor_name}
+                  name={item.id}
                 />
               }
-              label={item.instructor_name}
+              label={`${item.first_name} ${item.last_name}`}
             />
           ))}
         </FormGroup>

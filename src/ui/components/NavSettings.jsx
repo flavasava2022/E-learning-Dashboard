@@ -22,7 +22,7 @@ export default function NavSettings() {
   ];
   return (
     <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
-      <nav aria-label="main mailbox folders" className="flex">
+      <nav aria-label="main mailbox folders" className="flex overflow-auto">
         {menuItems.map((item) => (
           <List
             sx={{
@@ -35,6 +35,7 @@ export default function NavSettings() {
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 sx={{
+                  width: "max-content",
                   color: "black",
                   transition: "color 0.3s ease",
                   "&:hover": {

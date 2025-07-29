@@ -18,12 +18,12 @@ export const useFetch = (forceUpdate) => {
       setLoading(true);
       setError(null);
       try {
-        let query = supabase.from("courses").select("*").eq("published", true);
+        let query = supabase.from("courses").select("id").eq("published", true);
         if (instructors.length > 0) {
-          query = query.in("instructor_name", instructors);
+          query = query.in("instructor_id", instructors);
         }
         if (categories.length > 0) {
-          query = query.in("category_name", categories);
+          query = query.in("category_id", categories);
         }
         if (price.length > 0) {
           query = query.gte("price", price[0] || 0);

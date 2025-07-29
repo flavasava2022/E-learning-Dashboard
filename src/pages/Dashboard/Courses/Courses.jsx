@@ -102,7 +102,7 @@ export default function Courses() {
         {loading ? (
           <CircularProgress />
         ) : (
-          data?.map((course) => <CourseCard course={course} key={course?.id} />)
+          data?.map((course) => <CourseCard id={course.id} key={course?.id} />)
         )}
       </div>
       <Filters openFilters={openFilters} setOpenFilters={setOpenFilters} />

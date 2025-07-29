@@ -2,7 +2,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import { Box, Divider, Drawer, ListSubheader } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import List from "@mui/material/List";
-
+import LogoutIcon from "@mui/icons-material/Logout";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -55,7 +55,7 @@ export default function DesktopNavDashboard({ role }) {
           icon: <SettingsIcon />,
           path: "/dashboard/settings",
         },
-        { text: "Logout", icon: <SettingsIcon />, path: "/logout" },
+        { text: "Logout", icon: <LogoutIcon />, path: "/logout" },
       ],
     },
   ];

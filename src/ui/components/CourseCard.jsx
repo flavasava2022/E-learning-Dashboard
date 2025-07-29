@@ -16,11 +16,57 @@ import imgCourse from "../../assets/hussien_resized.jpg";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import ImportContactsIcon from "@mui/icons-material/ImportContacts";
-export default function CourseCard({ course }) {
+import { useEffect, useState } from "react";
+import { supabase } from "../../utils/supabase";
+export default function CourseCard({ id }) {
+  const [course, setCourse] = useState({});
+  useEffect(() => {
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from("courses")
+        .select(
+          `
+    *,
+    categories (
+      name
+    ),
+    users (
+      first_name,last_name,avatar_url),
+    modules (
+      id,
+      lessons (
+        id
+      )
+    ),
+    enrollments (
+      user_id,
+      users (
+        first_name,
+        last_name,
+        avatar_url
+      )
+    )
+  `
+        )
+        .eq("id", id);
+
+      if (error) {
+        console.error(error);
+      } else {
+        setCourse(data[0] || []); // Assuming data is an array and we want the first course
+      }
+    }
+    fetchData();
+  }, [id]);
+  const lessonsCount = course?.modules?.reduce(
+    (total, module) => total + (module?.lessons ? module.lessons?.length : 0),
+    0
+  );
+  console.log("Course Data:", course);
   return (
     <Card
       sx={{
-        height: "280px",
+        height: "320px",
         maxWidth: "50%",
         minWidth: "320px",
         borderRadius: 3,
@@ -56,14 +102,14 @@ export default function CourseCard({ course }) {
       <CardMedia
         sx={{
           width: "95%",
-          height: "90px",
+          height: "110px",
           borderRadius: 3,
           boxShadow: 4,
           objectFit: "fill",
         }}
         component="img"
         alt="green iguana"
-        image={imgCourse}
+        image={course?.image_url}
       />
       <CardContent className="flex flex-col gap-2 justify-between w-full h-full">
         <Box className="flex items-center justify-between">
@@ -77,13 +123,13 @@ export default function CourseCard({ course }) {
               <PeopleAltOutlinedIcon sx={{ color: "gray" }} />
               <Typography variant="subtitle1" component="div">
                 {" "}
-                {course?.participants ? course?.participants : "1000"}
+                {course?.enrollments?.length}
               </Typography>
             </div>{" "}
             <div className="flex items-center gap-1">
               <StarIcon sx={{ color: "#efb034" }} />
               <Typography variant="subtitle1" component="div">
-                {course?.rating ? course?.rating : "4.5"}
+                {course?.rating}
               </Typography>
             </div>
           </div>
@@ -95,7 +141,7 @@ export default function CourseCard({ course }) {
         <div className="flex items-center gap-4">
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
           <Typography gutterBottom variant="subtitle1" component="div">
-            {course?.created_by ? course?.created_by : "Hussien Essam"}
+            {course?.users?.first_name} {course?.users?.last_name}
           </Typography>
         </div>
       </CardContent>
@@ -103,12 +149,12 @@ export default function CourseCard({ course }) {
         <div className="flex items-center gap-4">
           <Avatar
             sx={{ borderRadius: "8px", width: 60, height: 60 }}
-            alt="Remy Sharp"
-            src="/static/images/avatar/1.jpg"
+            alt={`${course?.users?.first_name} ${course?.users?.last_name}`}
+            src={course?.users?.avatar_url}
           />
           <div>
             <Typography gutterBottom variant="body" component="div">
-              {course?.created_by ? course?.created_by : "Hussien Essam"}
+              {course?.users?.first_name} {course?.users?.last_name}
             </Typography>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 px-2 rounded-4xl bg-white">
@@ -119,7 +165,7 @@ export default function CourseCard({ course }) {
                   className="text-gray-600"
                 >
                   {" "}
-                  {course?.participants ? course?.participants : "1000"}
+                  {course?.enrollments?.length}
                 </Typography>
               </div>{" "}
               <div className="flex items-center gap-1 px-4 rounded-4xl bg-white">
@@ -129,7 +175,7 @@ export default function CourseCard({ course }) {
                   component="div"
                   className="text-[#efb034]"
                 >
-                  {course?.rating ? course?.rating : "4.5"}
+                  {course?.rating}
                 </Typography>
               </div>
             </div>
@@ -146,7 +192,7 @@ export default function CourseCard({ course }) {
             <PeopleAltOutlinedIcon sx={{ color: "white" }} />
             <Typography variant="subtitle1" component="div">
               {" "}
-              {course?.participants ? course?.participants : "1000"}
+              {course?.enrollments?.length}
             </Typography>
           </div>{" "}
           <Divider
@@ -158,7 +204,7 @@ export default function CourseCard({ course }) {
           <div className="flex items-center gap-1">
             <StarIcon sx={{ color: "#efb034" }} />
             <Typography variant="subtitle1" component="div">
-              {course?.rating ? course?.rating : "4.5"}
+              {course?.rating}
             </Typography>
           </div>
         </div>
@@ -167,7 +213,7 @@ export default function CourseCard({ course }) {
             <AutoAwesomeMotionIcon sx={{ color: "white" }} />
             <Typography variant="subtitle1" component="div">
               {" "}
-              {course?.participants ? course?.participants : "1000"} Modules
+              {course?.modules?.length} Modules
             </Typography>
           </div>{" "}
           <Divider
@@ -179,14 +225,14 @@ export default function CourseCard({ course }) {
           <div className="flex items-center gap-1">
             <ImportContactsIcon sx={{ color: "white" }} />
             <Typography variant="subtitle1" component="div">
-              {course?.rating ? course?.rating : "4.5"} Lessons
+              {lessonsCount} Lessons
             </Typography>
           </div>
         </div>
         <div></div>
         <CardActions className="flex items-center justify-around w-full">
           <Typography variant="h5" component="div">
-            $ {course?.price ? course?.price : "30"}
+            $ {course?.price}
           </Typography>
           <Button variant="contained">View Details</Button>
         </CardActions>

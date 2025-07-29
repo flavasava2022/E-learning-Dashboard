@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const signupSchema = z
   .object({
-    FirstName: z.string().min(1, "Name is required").max(70),
-    lastName: z.string().min(1, "Name is required").max(70),
+    FirstName: z.string().min(1, "First Name is required").max(70),
+    lastName: z.string().min(1, "Last Name is required").max(70),
     email: z.string().min(1, "Email is required").email("Email is invalid"),
 
     password: z
@@ -28,4 +28,11 @@ export const signinSchema = z.object({
     .string()
     .min(1, "Password is required")
     .max(32, "Password must be less than 32 characters"),
+});
+export const changeUSerData = z.object({
+  first_name: z.string().min(1, "First Name is required").max(70),
+  last_name: z.string().min(1, "Last Name is required").max(70),
+  phone_number: z.string().max(20).optional(),
+  bio: z.string().max(500, "Bio too long!").optional(),
+  email: z.string().email(), // if you want
 });

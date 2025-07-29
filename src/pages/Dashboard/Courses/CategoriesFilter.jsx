@@ -41,13 +41,13 @@ export default function CategoriesFilter() {
     }
     setChecked(newValues);
   };
-
+  console.log("Checked Categories:", items, checked);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data, error } = await supabase
           .from("categories")
-          .select("name");
+          .select("name,category_id");
 
         if (error) throw error;
         if (data) {
@@ -64,7 +64,10 @@ export default function CategoriesFilter() {
     const checkedValues = searchParams.getAll("categories");
     const checkBoxes = {};
     items.forEach(
-      (item) => (checkBoxes[item.name] = checkedValues.includes(item.name))
+      (item) =>
+        (checkBoxes[item.category_id] = checkedValues.includes(
+          item.category_id
+        ))
     );
     setChecked(checkBoxes);
   }, [items, searchParams]);
@@ -85,9 +88,9 @@ export default function CategoriesFilter() {
               key={item.name}
               control={
                 <Checkbox
-                  checked={!!checked[item.name]}
+                  checked={!!checked[item.category_id]}
                   onChange={handleChange}
-                  name={item.name}
+                  name={item.category_id}
                 />
               }
               label={item.name}
