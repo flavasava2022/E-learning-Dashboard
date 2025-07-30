@@ -18,12 +18,14 @@ import imgCourse from "../../assets/hussien_resized.jpg";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import ImportContactsIcon from "@mui/icons-material/ImportContacts";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
+import { useNavigate } from "react-router";
 export default function CourseCard({ id, alignment = "grid" }) {
   const [course, setCourse] = useState({});
   const isList = alignment === "list";
   const instructorName = `${course.users?.first_name ?? ""} ${course.users?.last_name ?? ""}`;
+  const Navigate = useNavigate();
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
@@ -182,7 +184,11 @@ export default function CourseCard({ id, alignment = "grid" }) {
           </Stack>
           {/* Show price directly in list view */}
           {isList ? (
-            <Button variant="contained" size="small">
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => Navigate(`/dashboard/courses/${course.id}`)}
+            >
               View Details
             </Button>
           ) : (
@@ -282,7 +288,12 @@ export default function CourseCard({ id, alignment = "grid" }) {
           <Typography variant="h5" component="div">
             $ {course?.price}
           </Typography>
-          <Button variant="contained">View Details</Button>
+          <Button
+            onClick={() => Navigate(`/dashboard/courses/${course.id}`)}
+            variant="contained"
+          >
+            View Details
+          </Button>
         </CardActions>
       </div>
     </Card>

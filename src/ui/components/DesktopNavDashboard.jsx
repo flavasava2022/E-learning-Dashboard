@@ -8,6 +8,10 @@ import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
 import SettingsIcon from "@mui/icons-material/Settings";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import HistoryIcon from "@mui/icons-material/History";
+import ModeIcon from "@mui/icons-material/Mode";
 import { ListItemButton } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../store/userSlice";
@@ -30,19 +34,19 @@ export default function DesktopNavDashboard({ role }) {
         { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
         {
           text: "My Profile",
-          icon: <SchoolIcon />,
-          path: "/dashboard/courses",
+          icon: <AccountCircleIcon />,
+          path: "/dashboard/settings/profile",
         },
-        { text: "Enrolled Courses", icon: <SettingsIcon />, path: "/settings" },
-        { text: "Order History", icon: <SettingsIcon />, path: "/orders" },
+        { text: "Courses", icon: <MenuBookIcon />, path: "/dashboard/courses" },
+        { text: "Order History", icon: <HistoryIcon />, path: "/orders" },
       ],
     },
     {
       header: "Instructor",
       show: role === "instructor",
       items: [
-        { text: "my Courses", icon: <SchoolIcon />, path: "/courses" },
-        { text: "assignments", icon: <SchoolIcon />, path: "/courses" },
+        { text: "Enrolled Courses", icon: <SchoolIcon />, path: "/courses" },
+        { text: "assignments", icon: <ModeIcon />, path: "/courses" },
       ],
     },
 
