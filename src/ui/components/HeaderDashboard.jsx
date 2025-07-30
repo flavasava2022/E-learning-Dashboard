@@ -14,7 +14,7 @@ import ProfileMenu from "../../pages/Dashboard/components/ProfileMenu";
 export default function HeaderDashboard() {
   const { openNavbar } = useSidebar();
   return (
-    <Box className="flex items-center gap-2 w-full max-w-dvw">
+    <Box className="flex items-center gap-2 w-full max-w-dvw h-[4vh]">
       <IconButton
         edge="start"
         color="primary"

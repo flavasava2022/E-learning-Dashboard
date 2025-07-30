@@ -27,7 +27,7 @@ export default function DashboardLayout() {
       )}
       <div className="flex flex-col  px-4 gap-4  flex-grow w-[85%]">
         <HeaderDashboard />
-        <div className="h-full w-full overflow-auto">
+        <div className="h-full w-full overflow-auto pt-4">
           {" "}
           <Outlet />
         </div>

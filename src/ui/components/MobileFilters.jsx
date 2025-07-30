@@ -4,7 +4,7 @@ import RangeFilter from "./RangeFilter";
 import InstructorsFilter from "./InstructorsFilter";
 import ReviewFilter from "./ReviewFilter";
 
-export default function Filters({ openFilters, setOpenFilters }) {
+export default function MobileFilters({ openFilters, setOpenFilters }) {
   const toggleDrawer = (newOpen) => () => {
     setOpenFilters(newOpen);
   };

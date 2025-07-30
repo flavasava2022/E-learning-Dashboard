@@ -63,7 +63,7 @@ export default function DesktopNavDashboard({ role }) {
     <List
       sx={{
         // Change background color of the whole List (drawer)
-        width: isOpen ? "25%" : "5%",
+        width: isOpen ? "250px" : "70px",
         transition: "width 1s",
         bgcolor: "#32323f",
         height: "100%",

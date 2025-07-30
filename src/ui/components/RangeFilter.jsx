@@ -43,7 +43,15 @@ export default function RangeFilter() {
   };
 
   return (
-    <Accordion>
+    <Accordion
+      sx={{
+        width: "100%",
+        border: 0,
+        borderRadius: 0,
+        boxShadow: 0,
+        "&:before": { backgroundColor: "transparent" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ArrowDropDownIcon />}
         aria-controls="panel2-content"
@@ -52,7 +60,7 @@ export default function RangeFilter() {
         <Typography component="span">Price Range</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Box sx={{ width: 300 }}>
+        <Box>
           <Slider
             getAriaLabel={() => "Price Range range"}
             value={value}

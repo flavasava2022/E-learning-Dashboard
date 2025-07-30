@@ -5,8 +5,9 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useEffect, useState } from "react";
-import { supabase } from "../../../utils/supabase";
+
 import { useSearchParams } from "react-router";
+import { supabase } from "../../utils/supabase";
 
 export default function InstructorsFilter() {
   const [items, setItems] = useState([]);
@@ -69,7 +70,15 @@ export default function InstructorsFilter() {
     setChecked(checkBoxes);
   }, [items, searchParams]);
   return (
-    <Accordion>
+    <Accordion
+      sx={{
+        width: "100%",
+        border: 0,
+        borderRadius: 0,
+        boxShadow: 0,
+        "&:before": { backgroundColor: "transparent" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ArrowDropDownIcon />}
         aria-controls="panel2-content"

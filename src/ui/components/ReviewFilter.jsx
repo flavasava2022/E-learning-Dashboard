@@ -13,7 +13,15 @@ export default function ReviewFilter() {
   const [value, setValue] = useState(searchParams.get("rating") || 0);
 
   return (
-    <Accordion>
+    <Accordion
+      sx={{
+        width: "100%",
+        border: 0,
+        borderRadius: 0,
+        boxShadow: 0,
+        "&:before": { backgroundColor: "transparent" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ArrowDropDownIcon />}
         aria-controls="panel2-content"
