@@ -1,5 +1,5 @@
 import { useSidebar } from "../../context/SidebarContext";
-import { Box, Divider, Drawer, ListSubheader } from "@mui/material";
+import { Box, Divider, Drawer, ListSubheader, Tooltip } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import List from "@mui/material/List";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -46,7 +46,7 @@ export default function DesktopNavDashboard({ role }) {
       show: role === "instructor",
       items: [
         { text: "Enrolled Courses", icon: <SchoolIcon />, path: "/courses" },
-        { text: "assignments", icon: <ModeIcon />, path: "/courses" },
+        { text: "assignments", icon: <SchoolIcon />, path: "/courses" },
       ],
     },
 
@@ -103,6 +103,7 @@ export default function DesktopNavDashboard({ role }) {
               {section.header}
             </ListSubheader>
             {section.items.map((item) => (
+                                  <Tooltip placement="right" title={item?.text}>
               <ListItemButton
                 key={item.text}
                 sx={{
@@ -129,6 +130,7 @@ export default function DesktopNavDashboard({ role }) {
                     : navigate(item.path)
                 }
               >
+
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText
                   primary={item.text}
@@ -137,7 +139,10 @@ export default function DesktopNavDashboard({ role }) {
                     transition: "display 0.3s ease",
                   }}
                 />
+
+
               </ListItemButton>
+                  </Tooltip>
             ))}
           </Fragment>
         ))}

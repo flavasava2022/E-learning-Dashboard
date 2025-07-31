@@ -1,29 +1,22 @@
 import OverviewContainer from "./OverviewContainer";
 
-import CoursesTable from "../components/CoursesTable";
+
 import { PieChart } from "@mui/x-charts/PieChart";
 
 import Calender from "../../../ui/components/Calender";
 import { BarChart, LineChart } from "@mui/x-charts";
 import Assignments from "../../../ui/components/Assignments";
+import StudyStatistics from "../../../ui/components/StudyStatistics";
+import EnrolledCourses from "../../../ui/components/EnrolledCourses";
+import MyCoursesTable from "../../../ui/components/MyCoursesTable";
 export default function Home() {
   return (
     <div className="flex  gap-4 w-full h-full">
       <div className="flex flex-col flex-grow gap-4">
-        <OverviewContainer />
-        <h1 className="text-2xl font-semibold mb-4 ">Study Statistics</h1>
-        <LineChart
-          xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-          series={[
-            {
-              data: [2, 5.5, 2, 8.5, 1.5, 5],
-              area: true,
-            },
-          ]}
-          height={300}
-        />
-        <h1 className="text-2xl font-semibold mb-4 ">My Courses</h1>
-        <CoursesTable />
+        {/* <OverviewContainer /> */}
+<StudyStatistics/>
+<EnrolledCourses/>
+<MyCoursesTable/>
       </div>
       <div className="flex flex-col gap-4 w-full max-w-[400px]">
         <div>

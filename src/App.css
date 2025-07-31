@@ -1,5 +1,8 @@
 @import "tailwindcss";
-
+* {
+  box-sizing: border-box !important;
+  font-family: "IBM Plex Serif", serif;
+}
 @theme {
   /* Base colors */
   --color-white: #ffffff;
@@ -187,10 +190,12 @@
 }
 
 .animated-div {
-  transition:
-    width 1s,
+  transition: width 1s;
 }
 .animate-divw {
-  transition: opacity 1s, display 0.7s, width 0.9s;
+  transition:
+    opacity 1s,
+    display 0.7s,
+    width 0.9s;
   transition-behavior: allow-discrete;
 }

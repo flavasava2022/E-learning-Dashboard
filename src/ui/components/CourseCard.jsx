@@ -38,12 +38,12 @@ export default function CourseCard({ id, alignment = "grid" }) {
     ),
     users (
       first_name,last_name,avatar_url),
-    modules (
-      id,
-      lessons (
-        id
-      )
-    ),
+      modules (
+        *,
+        lessons (
+          *
+        )
+      ),
     enrollments (
       user_id,
       users (

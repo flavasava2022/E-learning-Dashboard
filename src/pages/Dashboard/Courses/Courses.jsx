@@ -72,10 +72,10 @@ export default function Courses() {
             onChange={handleAlignment}
             aria-label="text alignment"
           >
-            <ToggleButton value="list" aria-label="list">
+            <ToggleButton value="list" aria-label="list" disabled={alignment==='list'}>
               <ViewHeadlineIcon />
             </ToggleButton>
-            <ToggleButton value="grid" aria-label="grid">
+            <ToggleButton value="grid" aria-label="grid" disabled={alignment==='grid'}>
               <GridViewIcon />
             </ToggleButton>
           </ToggleButtonGroup>
