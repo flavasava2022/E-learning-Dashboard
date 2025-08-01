@@ -42,7 +42,6 @@ export default function CategoriesFilter() {
     }
     setChecked(newValues);
   };
-  console.log("Checked Categories:", items, checked);
   useEffect(() => {
     const fetchCategories = async () => {
       try {

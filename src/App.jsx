@@ -15,6 +15,7 @@ import Password from "./pages/Dashboard/Settings/Password";
 import Profile from "./pages/Dashboard/Settings/Profile";
 import Notification from "./pages/Dashboard/Settings/Notification";
 import CourseDetails from "./pages/Dashboard/CourseDetails";
+import MyCourses from "./pages/MyCourses/MyCourses";
 
 function App() {
   const route = createBrowserRouter([
@@ -40,6 +41,7 @@ function App() {
         { index: true, element: <Home /> },
         { path: "courses", element: <Courses /> },
         { path: "courses/:slug", element: <CourseDetails /> },
+                { path: "mycourses/", element: <MyCourses /> },
         {
           path: "settings",
           element: <SettingsLayout />,

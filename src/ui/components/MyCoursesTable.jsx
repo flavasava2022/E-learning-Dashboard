@@ -15,6 +15,7 @@ import {
   Button,
   Rating,
   Stack,
+  Link,
 } from "@mui/material";
 import dayjs from "dayjs";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
@@ -229,9 +230,21 @@ export default function MyCoursesTable() {
   }, [user]);
   return (
     <Box sx={{ width: "100%", p: 2, boxSizing: "border-box" }}>
+    <Box sx={{ width: "100%", display:'flex',alignItems:'center',justifyContent:'space-between' }}>
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
         My Courses
       </Typography>
+      <Link
+  component="button"
+  variant="body2"
+  onClick={() => {
+    navigate(`/dashboard/mycourses`)
+  }}
+>
+See All
+</Link>
+      
+    </Box>
       {/* FIX: Add a container with a defined height */}
       {isMobile ? (
         <Box>

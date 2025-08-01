@@ -30,7 +30,7 @@ export default function Courses() {
   const [alignment, setAlignment] = useState("grid");
   const [search, setSearch] = useState(" ");
   const [page, setPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 8;
 
   const handleAlignment = (event, newAlignment) => {
     setAlignment(newAlignment);

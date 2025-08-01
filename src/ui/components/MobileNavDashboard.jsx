@@ -1,13 +1,17 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useSidebar } from "../../context/SidebarContext";
-import { Drawer, ListSubheader } from "@mui/material";
+import { Drawer, ListSubheader, Tooltip } from "@mui/material";
 import List from "@mui/material/List";
 
+import LogoutIcon from "@mui/icons-material/Logout";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
 import SettingsIcon from "@mui/icons-material/Settings";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import HistoryIcon from "@mui/icons-material/History";
 import { ListItemButton } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import { logoutUser } from "../../store/userSlice";
@@ -27,16 +31,20 @@ export default function MobileNavDashboard({ role }) {
       show: true,
       items: [
         { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-        { text: "My Profile", icon: <SchoolIcon />, path: "/courses" },
-        { text: "Enrolled Courses", icon: <SettingsIcon />, path: "/settings" },
-        { text: "Order History", icon: <SettingsIcon />, path: "/orders" },
+        {
+          text: "My Profile",
+          icon: <AccountCircleIcon />,
+          path: "/dashboard/settings/profile",
+        },
+        { text: "Courses", icon: <MenuBookIcon />, path: "/dashboard/courses" },
+        { text: "Order History", icon: <HistoryIcon />, path: "/orders" },
       ],
     },
     {
       header: "Instructor",
       show: role === "instructor",
       items: [
-        { text: "my Courses", icon: <SchoolIcon />, path: "/courses" },
+        { text: "Enrolled Courses", icon: <SchoolIcon />, path: "/courses" },
         { text: "assignments", icon: <SchoolIcon />, path: "/courses" },
       ],
     },
@@ -45,8 +53,12 @@ export default function MobileNavDashboard({ role }) {
       header: "User",
       show: true,
       items: [
-        { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
-        { text: "Logout", icon: <SettingsIcon />, path: "/logout" },
+        {
+          text: "Settings",
+          icon: <SettingsIcon />,
+          path: "/dashboard/settings",
+        },
+        { text: "Logout", icon: <LogoutIcon />, path: "/logout" },
       ],
     },
   ];
@@ -78,8 +90,8 @@ export default function MobileNavDashboard({ role }) {
       >
         {menuItems
           .filter((section) => section?.show)
-          .map((section) => (
-            <>
+          .map((section,index) => (
+            <Fragment key={index}>
               <ListSubheader
                 sx={{
                   bgcolor: "inherit",
@@ -91,12 +103,14 @@ export default function MobileNavDashboard({ role }) {
                   fontSize: "1rem",
                   transition: "display 0.3s ease",
                 }}
+                key={section?.index}
                 disableSticky
               >
                 {section.header}
               </ListSubheader>
               {section.items.map((item) => (
                 <ListItemButton
+                  key={item.text}
                   sx={{
                     "&.Mui-selected, &.Mui-selected:hover": {
                       bgcolor: "#2d9cdb",
@@ -114,7 +128,6 @@ export default function MobileNavDashboard({ role }) {
                       "& .MuiListItemIcon-root": { color: "primary.main" },
                     },
                   }}
-                  key={item.text}
                   selected={location.pathname === item.path}
                   onClick={() =>
                     item?.path === "/logout"
@@ -126,7 +139,7 @@ export default function MobileNavDashboard({ role }) {
                   <ListItemText primary={item.text} />
                 </ListItemButton>
               ))}
-            </>
+            </Fragment>
           ))}
       </List>
     </Drawer>
