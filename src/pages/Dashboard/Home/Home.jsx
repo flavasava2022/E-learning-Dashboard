@@ -11,21 +11,18 @@ import EnrolledCourses from "../../../ui/components/EnrolledCourses";
 import MyCoursesTable from "../../../ui/components/MyCoursesTable";
 export default function Home() {
   return (
-    <div className="flex  gap-4 w-full h-full">
-      <div className="flex flex-col flex-grow gap-4">
+    <div className="flex justify-between w-full h-full">
+      <div className="flex flex-col flex-grow  md:max-w-[75%]">
         {/* <OverviewContainer /> */}
 <StudyStatistics/>
 <EnrolledCourses/>
 <MyCoursesTable/>
       </div>
-      <div className="flex flex-col gap-4 w-full max-w-[400px]">
-        <div>
-          <h1 className="text-2xl font-semibold mb-4">Calender</h1>
-          <Calender />
-        </div>
-        <Assignments />
+      <div className="hidden md:flex flex-col gap-4 w-[400px] max-w-[25%]">
 
-        <div>
+
+
+        <div className="">
           <h1 className="text-2xl font-semibold mb-4">My Progress</h1>
           <PieChart
             sx={{
@@ -48,6 +45,7 @@ export default function Home() {
             height={200}
           />
         </div>
+                <Assignments />
       </div>
     </div>
   );

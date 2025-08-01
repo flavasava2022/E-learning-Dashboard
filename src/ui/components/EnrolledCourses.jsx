@@ -36,8 +36,8 @@ export default function EnrolledCourses() {
     {
       field: "instructor",
       headerName: "Instructor",
-      minWidth: 180,
-      flex: 1,
+      minWidth: 160,
+
       headerAlign: "center",
       align: "center",
     },
@@ -49,7 +49,7 @@ export default function EnrolledCourses() {
         const status = params.value;
         const color = status === "completed" ? "success" : "warning";
         const label = status;
-        return <Chip label={label} color={color} />;
+        return <Chip label={label} color={color} sx={{ borderRadius: 2 }} />;
       },
       minWidth: 100,
       headerAlign: "center",
@@ -91,7 +91,7 @@ export default function EnrolledCourses() {
           </Box>
         );
       },
-      minWidth: 180,
+      minWidth: 120,
 
       headerAlign: "center",
       align: "center",
@@ -112,7 +112,7 @@ export default function EnrolledCourses() {
           </IconButton>
         );
       },
-      minWidth: 110,
+ 
 
       headerAlign: "center",
       align: "center",
@@ -240,7 +240,7 @@ const MobileCourseCard = ({ course }) => {
           label={course.status}
           color={course.status === "completed" ? "success" : "warning"}
           size="small"
-          sx={{ mb: 1 }}
+          sx={{ borderRadius: 2, mb: 1 }}
         />
         <Typography color="text.secondary" sx={{ mb: 1 }}>
           <strong>Instructor:</strong> {course.instructor}

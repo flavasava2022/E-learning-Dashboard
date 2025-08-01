@@ -131,7 +131,7 @@ export const checkSession = createAsyncThunk(
         .eq("id", data.session.user.id)
         .single();
 
-        console.log("User profile:", profile);
+
         dispatch(showSnackbar({ message: `Welcome back ${profile?.first_name}`, severity: 'success' }));
       return {
         user: profile,

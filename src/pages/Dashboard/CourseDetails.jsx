@@ -19,9 +19,9 @@ import {
   Button,
 } from "@mui/material";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
+
 import SlowMotionVideoIcon from "@mui/icons-material/SlowMotionVideo";
-import ImportContactsIcon from "@mui/icons-material/ImportContacts";
+
 import StarIcon from "@mui/icons-material/Star";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
@@ -203,7 +203,11 @@ export default function CourseDetails() {
               </Stack>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <AccessTimeIcon fontSize="small" color="action" />
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{ display: { xs: "none", md: "block" } }}
+                  color="text.secondary"
+                >
                   {TotalHours.toFixed(2)}
                 </Typography>
                 <Typography

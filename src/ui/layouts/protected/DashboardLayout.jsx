@@ -9,6 +9,7 @@ import { useMediaQuery } from "react-responsive";
 import HeaderDashboard from "../../components/HeaderDashboard";
 
 import { Outlet } from "react-router";
+import { Container } from "@mui/material";
 
 export default function DashboardLayout() {
   const dispatch = useDispatch();
@@ -19,15 +20,15 @@ export default function DashboardLayout() {
   }, [dispatch]);
 
   return (
-    <div className="dashboard-container p-4 h-[100vh]  flex gap-2 max-w-dvw ">
+    <div className=" p-4 h-[100vh]  flex gap-2 max-w-[100vw]">
       {isMobile ? (
         <MobileNavDashboard role={role} />
       ) : (
         <DesktopNavDashboard role={role} />
       )}
-      <div className="flex flex-col  px-4 gap-4  flex-grow w-[85%]">
+<div className="flex flex-col px-4 gap-4 flex-grow max-w-[100%] min-w-0">
         <HeaderDashboard />
-        <div className="h-full w-full overflow-auto pt-4">
+        <div className="h-full w-full overflow-y-auto pt-4">
           {" "}
           <Outlet />
         </div>

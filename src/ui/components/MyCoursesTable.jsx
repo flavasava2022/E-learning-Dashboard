@@ -14,9 +14,17 @@ import {
   CardContent,
   Button,
   Rating,
+  Stack,
 } from "@mui/material";
 import dayjs from "dayjs";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import StarIcon from "@mui/icons-material/Star";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
+
+import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router";
 import { useMediaQuery } from "react-responsive";
 export default function MyCoursesTable() {
@@ -34,27 +42,27 @@ export default function MyCoursesTable() {
       headerAlign: "center",
       align: "center",
     },
-        {
+    {
       field: "students",
       headerName: "Students",
       minWidth: 100,
-      type:'number',
+      type: "number",
       headerAlign: "center",
       align: "center",
     },
-            {
+    {
       field: "sections",
       headerName: "Sections",
-      minWidth: 100,
-      type:'number',
+
+      type: "number",
       headerAlign: "center",
       align: "center",
     },
-                {
+    {
       field: "lessons",
       headerName: "Lessons",
-      minWidth: 100,
-      type:'number',
+
+      type: "number",
       headerAlign: "center",
       align: "center",
     },
@@ -65,10 +73,10 @@ export default function MyCoursesTable() {
       renderCell: (params) => {
         const status = params.value;
         const color = status ? "success" : "warning";
-        const label = status?'Published':'Ongoing';
-        return <Chip label={label} color={color} />;
+        const label = status ? "Published" : "Ongoing";
+        return <Chip sx={{ borderRadius: 2 }} label={label} color={color} />;
       },
-      minWidth: 100,
+
       headerAlign: "center",
       align: "center",
     },
@@ -78,7 +86,7 @@ export default function MyCoursesTable() {
       type: "date",
       valueFormatter: (value) =>
         value ? dayjs(value).format("MM/DD/YYYY") : "",
-      minWidth: 100, // Set minimum width
+ 
 
       headerAlign: "center",
       align: "center",
@@ -98,13 +106,11 @@ export default function MyCoursesTable() {
               justifyContent: "center",
             }}
           >
-            <Tooltip title={status != null ? status.toFixed(0) : ""}>
-   <Rating name="read-only" value={status} readOnly />
-            </Tooltip>
+            <Rating name="read-only" value={status} readOnly />
           </Box>
         );
       },
-      minWidth: 180,
+      minWidth: 120,
 
       headerAlign: "center",
       align: "center",
@@ -115,14 +121,31 @@ export default function MyCoursesTable() {
 
       renderCell: (params) => {
         return (
-          <IconButton
-            edge="start"
-            color="primary"
-            aria-label="View Course"
-            onClick={() => navigate(`/dashboard/courses/${params.id}`)}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <RemoveRedEyeIcon />
-          </IconButton>
+            <IconButton
+              edge="start"
+              color="primary"
+              aria-label="View Course"
+              onClick={() => navigate(`/dashboard/courses/${params.id}`)}
+            >
+              <RemoveRedEyeIcon />
+            </IconButton>
+            <IconButton
+              edge="start"
+              color="primary"
+              aria-label="View Course"
+              onClick={() => navigate(`/dashboard/courses/${params.id}/edit`)}
+            >
+              <EditIcon />
+            </IconButton>
+          </Box>
         );
       },
       minWidth: 110,
@@ -132,15 +155,14 @@ export default function MyCoursesTable() {
     },
   ];
 
-  console.log(tableData);
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-             const { data, error } = await supabase
-        .from("courses")
-        .select(
-          `
+        const { data, error } = await supabase
+          .from("courses")
+          .select(
+            `
       *,
       categories (
         name
@@ -162,30 +184,27 @@ export default function MyCoursesTable() {
         )
       )
     `
-        )
-        .eq("instructor_id", user?.id);
+          )
+          .eq("instructor_id", user?.id);
         if (!data || data.length === 0) {
           setTableData([]);
           return;
         }
-        const rows = data?.map((course) => {
-
-
+        const rows = data
+          ?.map((course) => {
             const totalLessons = course.modules.reduce(
               (acc, module) => acc + (module.lessons?.length || 0),
               0
             );
-const studentNum = course.enrollments.length||0
-const modulesNum = course?.modules.length||0
-
-
+            const studentNum = course.enrollments.length || 0;
+            const modulesNum = course?.modules.length || 0;
 
             return {
               id: course.id,
               title: course.title,
               students: studentNum,
-              sections:modulesNum,
-              lessons:totalLessons,
+              sections: modulesNum,
+              lessons: totalLessons,
               status: course?.published,
               createdDate: course?.created_at,
               rating: course?.rating,
@@ -225,7 +244,7 @@ const modulesNum = course?.modules.length||0
           )}
         </Box>
       ) : (
-        <Box sx={{ width: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <DataGrid
             sx={{
               "& .MuiDataGrid-cell": {
@@ -241,56 +260,97 @@ const modulesNum = course?.modules.length||0
             disableRowSelectionOnClick
             disableColumnMenu
           />
-        </Box>
+        </div>
       )}
     </Box>
   );
 }
 
 const MobileCourseCard = ({ course }) => {
+  console.log(course);
+  const navigate = useNavigate();
   return (
     <Card sx={{ mb: 2, width: "100%" }}>
-      <CardContent>
+      <CardContent >
         <Typography variant="h6" component="div" gutterBottom>
           {course.title}
         </Typography>
         <Chip
-          label={course.status}
-          color={course.status === "completed" ? "success" : "warning"}
+          sx={{ borderRadius: 2, mb: 1 }}
+          label={course?.status ? "Published" : "Ongoing"}
+          color={course?.status ? "success" : "warning"}
           size="small"
-          sx={{ mb: 1 }}
         />
-        <Typography color="text.secondary" sx={{ mb: 1 }}>
-          <strong>Instructor:</strong> {course.instructor}
-        </Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
-          <strong>Enrolled:</strong>{" "}
+          <strong>Created:</strong>{" "}
           {dayjs(course.enrollDate).format("MMM D, YYYY")}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
-          Progress
-        </Typography>
-        <Box
-          sx={{ display: "flex", alignItems: "center", width: "100%", mb: 2 }}
-        >
-          <Box sx={{ width: "100%", mr: 1 }}>
-            <LinearProgress variant="determinate" value={course.progress} />
-          </Box>
-          <Box sx={{ minWidth: 35 }}>
+        <Stack direction="row" alignItems="center" justifyContent='center' spacing={3} sx={{ mb: 2 }}>
+<Tooltip title='Sections'>
+            <Stack direction="row" alignItems="center" spacing={1}>
+            <MenuBookIcon fontSize="small" sx={{ color: "#2d9cdb" }} />
             <Typography variant="body2" color="text.secondary">
-              {`${Math.round(course.progress)}%`}
+              {course?.sections ?? 0}
             </Typography>
-          </Box>
-        </Box>
 
-        <Button
+          </Stack>
+</Tooltip>
+<Tooltip title='Lectures'>
+
+
+
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <LibraryBooksOutlinedIcon fontSize="small" sx={{ color: "#2d9cdb" }} />
+            <Typography variant="body2" color="text.secondary">
+              {course?.lessons ?? 0}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ display: { xs: "none", md: "block" } }}
+              color="text.secondary"
+            >
+              Lectures
+            </Typography>
+            
+
+          </Stack>
+          </Tooltip>
+                      <Tooltip title='Enrolled'>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                <PeopleAltOutlinedIcon fontSize="small" color="action" />
+                <Typography variant="body2" color="text.secondary">
+                  {course?.students ?? 0}
+                </Typography>
+              </Stack>
+              </Tooltip>
+              <Tooltip title='Rating'>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <StarIcon fontSize="small" sx={{ color: "#ffb400" }} />
+            <Typography variant="body2" color="text.secondary">
+              {course?.rating ?? 0}
+            </Typography>
+
+          </Stack>
+          </Tooltip>
+        </Stack>
+
+<Box sx={{display:'flex',alignItems:'center' ,justifyContent:'space-between'}}>
+          <Button
           variant="contained"
           size="small"
-          onClick={() => alert(`Viewing course: ${course.title}`)}
+          onClick={() => navigate("/dashboard/courses/${course?.id}")}
         >
           View Course
         </Button>
+                <Button
+          variant="contained"
+          size="small"
+          onClick={() => navigate("/dashboard/courses/${course?.id}")}
+        >
+          View Course
+        </Button>
+</Box>
       </CardContent>
     </Card>
   );

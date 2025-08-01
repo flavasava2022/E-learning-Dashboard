@@ -81,6 +81,7 @@ export default function DesktopNavDashboard({ role }) {
           my: 0.5,
         },
       }}
+      className="relative"
     >
       {menuItems
         .filter((section) => section?.show)
@@ -103,46 +104,42 @@ export default function DesktopNavDashboard({ role }) {
               {section.header}
             </ListSubheader>
             {section.items.map((item) => (
-                                  <Tooltip placement="right" title={item?.text}>
-              <ListItemButton
-                key={item.text}
-                sx={{
-                  color: "white",
-                  "&.Mui-selected, &.Mui-selected:hover": {
-                    bgcolor: "#2d9cdb",
-                    color: "#ffffff",
-                  },
-                  "& .MuiListItemIcon-root": {
-                    minWidth: 0,
-                    mr: 2,
-                    color: "white",
-                  },
-                  "&:hover": {
-                    bgcolor: "#ffbf00",
-                    color: "primary.main",
-                    "& .MuiListItemIcon-root": { color: "primary.main" },
-                  },
-                }}
-                selected={location.pathname === item.path}
-                onClick={() =>
-                  item?.path === "/logout"
-                    ? handleLogout()
-                    : navigate(item.path)
-                }
-              >
-
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText
-                  primary={item.text}
+              <Tooltip placement="right" title={item?.text} key={item.text}>
+                <ListItemButton
                   sx={{
-                    display: isOpen ? "block" : "none",
-                    transition: "display 0.3s ease",
+                    color: "white",
+                    "&.Mui-selected, &.Mui-selected:hover": {
+                      bgcolor: "#2d9cdb",
+                      color: "#ffffff",
+                    },
+                    "& .MuiListItemIcon-root": {
+                      minWidth: 0,
+                      mr: 2,
+                      color: "white",
+                    },
+                    "&:hover": {
+                      bgcolor: "#ffbf00",
+                      color: "primary.main",
+                      "& .MuiListItemIcon-root": { color: "primary.main" },
+                    },
                   }}
-                />
-
-
-              </ListItemButton>
-                  </Tooltip>
+                  selected={location.pathname === item.path}
+                  onClick={() =>
+                    item?.path === "/logout"
+                      ? handleLogout()
+                      : navigate(item.path)
+                  }
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{
+                      display: isOpen ? "block" : "none",
+                      transition: "display 0.3s ease",
+                    }}
+                  />
+                </ListItemButton>
+              </Tooltip>
             ))}
           </Fragment>
         ))}
