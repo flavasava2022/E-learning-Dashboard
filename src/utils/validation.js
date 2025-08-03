@@ -36,3 +36,7 @@ export const changeUSerData = z.object({
   bio: z.string().max(500, "Bio too long!").optional(),
   email: z.string().email(), // if you want
 });
+export const createCourseData = z.object({
+
+
+});

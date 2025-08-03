@@ -20,7 +20,7 @@ export default function DashboardLayout() {
   }, [dispatch]);
 
   return (
-    <div className=" p-4 h-[100vh]  flex gap-2 max-w-[100vw]">
+    <div className=" p-4 h-[100vh] max-h-[100vh]  flex gap-2 max-w-[100vw]">
       {isMobile ? (
         <MobileNavDashboard role={role} />
       ) : (
@@ -28,7 +28,7 @@ export default function DashboardLayout() {
       )}
 <div className="flex flex-col px-4 gap-4 flex-grow max-w-[100%] min-w-0">
         <HeaderDashboard />
-        <div className="h-full w-full overflow-y-auto pt-4">
+        <div className="h-full w-full overflow-y-auto pt-4 p-1">
           {" "}
           <Outlet />
         </div>
