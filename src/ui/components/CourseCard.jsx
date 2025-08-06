@@ -25,6 +25,7 @@ import { useNavigate } from "react-router";
 export default function CourseCard({ id, alignment, page = "courses" }) {
   const [course, setCourse] = useState({});
   const [loading, setLoading] = useState(false);
+  console.log(course)
   const isList = alignment === "list";
   const instructorName = `${course.users?.first_name ?? ""} ${course.users?.last_name ?? ""}`;
   const Navigate = useNavigate();

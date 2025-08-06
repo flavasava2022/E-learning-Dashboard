@@ -1,60 +1,121 @@
 import {
   Box,
-  Breadcrumbs,
-  Link,
   Typography,
   Button,
-  ButtonBase,
-  InputLabel,
-  TextareaAutosize,
   TextField,
-  Avatar,
   InputAdornment,
 } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UploadIcon from "@mui/icons-material/Upload";
-import { Controller, useForm } from "react-hook-form"; // Import Controller
+
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createCourseData } from "../../../utils/validation";
-import { useEffect, useState } from "react";
 
 import LevelSelector from "./LevelSelector";
 import CategoriesSelector from "./CategoriesSelector";
 import TagsSelector from "./TagsSelector";
 import DescriptionInput from "./DescriptionInput";
 import ImageUploader from "./ImageUploader";
-import PriceInput from "./PriceInput";
+import { supabase, uploadFile } from "../../../utils/supabase";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { showSnackbar } from "../../../store/snackbarSlice";
 
-export default function BasicInfoForm({ onTitleChange }) {
+export default function BasicInfoForm({
+  setBreadcrumbsTitle,
+  courseData,
+  setValue,
+  setCourseData,
+}) {
   const user = useSelector((state) => state?.auth?.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     control,
     getValues,
+    reset,
     formState: { errors, isValid, isSubmitting, isDirty },
   } = useForm({
     resolver: zodResolver(createCourseData),
-    mode: "onBlur",
-    defaultValues: {
-      title: "",
-      description: "",
-      course_level: "beginner", // Correct
-      category_id: "5a279548-eee0-4c10-96f2-ca2be70a277f",
-      tags: [],
-    },
+    mode: "onChange",
+    defaultValues: courseData || {},
   });
-  const dispatch = useDispatch();
-  const onSubmit = async (data) => {
-    console.log(data);
-    // await dispatch();
+  useEffect(() => {
+    if (courseData) {
+      reset(courseData);
+    }
+  }, [courseData, reset]);
+  const onSubmit = async (dataForm) => {
+    try {
+      const { image_url: imageFile, ...formData } = dataForm;
+
+      let imageUrl = courseData?.image_url;
+
+      if (imageFile instanceof File) {
+        const fileName = `${user.email}_${formData.title}_course-pic`;
+        imageUrl = await uploadFile(imageFile, fileName);
+        if (!imageUrl) {
+          return;
+        }
+      }
+
+      const payload = {
+        ...formData,
+        image_url: imageUrl,
+        edit_course_step: 1,
+      };
+
+      if (courseData?.id) {
+        // --- EDIT MODE ---
+
+        const { data, error } = await supabase
+          .from("courses")
+          .update(payload)
+          .eq("id", courseData.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setCourseData((previousCourseData) => {
+            return {
+              ...previousCourseData,
+              ...data,
+            };
+          });
+          setValue(1);
+        }
+      } else {
+        // --- CREATE MODE ---
+        console.log("Creating new course...");
+        const { data, error } = await supabase
+          .from("courses")
+          .insert({ ...payload, instructor_id: user?.id })
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setCourseData((previousCourseData) => {
+            return {
+              ...previousCourseData,
+              ...data,
+            };
+          });
+          setValue(1);
+          navigate(`/dashboard/mycourses/create/${data.id}`);
+        }
+      }
+    } catch (error) {
+      dispatch(showSnackbar({ message: error.message, severity: "error" }));
+    }
   };
 
   const handleTitleBlur = () => {
-    if (onTitleChange) {
-      const currentTitle = getValues("title");
-      onTitleChange(currentTitle);
-    }
+    const currentTitle = getValues("title");
+    setBreadcrumbsTitle(currentTitle);
   };
   return (
     <Box

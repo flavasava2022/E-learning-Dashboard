@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react"; // Make sure useEffect is imported
 import { Controller } from "react-hook-form";
 import { Avatar, Box, ButtonBase, InputLabel, Typography } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 
 export default function ImageUploader({ name, control, errors }) {
-  // This state is now local to the uploader component
   const [previewSrc, setPreviewSrc] = useState(null);
 
   return (
@@ -14,20 +13,25 @@ export default function ImageUploader({ name, control, errors }) {
       </InputLabel>
 
       <Controller
-      
         name={name}
         control={control}
         defaultValue={null}
-        render={({ field: { onChange, value, ...field } }) => {
+        render={({ field: { onChange, value } }) => {
+          useEffect(() => {
+            if (typeof value === "string" && value) {
+              setPreviewSrc(value);
+            }
+          }, [value]);
+
           const handleFileChange = (event) => {
             const file = event.target.files?.[0];
             if (file) {
-              // Update react-hook-form's state with the File object
+              // This updates the form state, making it dirty.
               onChange(file);
 
-              // Update the local state to show a preview
+              // This updates the local preview state.
               const reader = new FileReader();
-              reader.onload = () => setPreviewSrc(reader.result);
+              reader.onload = (e) => setPreviewSrc(e.target.result);
               reader.readAsDataURL(file);
             }
           };
@@ -42,14 +46,20 @@ export default function ImageUploader({ name, control, errors }) {
                   height: "350px",
                   borderRadius: 3,
                   p: 1,
-                  border: `2px dashed ${errors[name] ? '#d32f2f' : '#d1d5dd'}`,
+                  border: `2px dashed ${errors[name] ? "#d32f2f" : "#d1d5dd"}`,
                 }}
               >
+                {/* This logic now works perfectly for both existing and new images */}
                 {previewSrc ? (
                   <Avatar
                     alt="Cover preview"
                     src={previewSrc}
-                    sx={{ width: "100%", height: "100%", borderRadius: 2, objectFit: "cover" }}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: 2,
+                      objectFit: "cover",
+                    }}
                   />
                 ) : (
                   <Box
@@ -65,8 +75,8 @@ export default function ImageUploader({ name, control, errors }) {
                       backgroundColor: "primary.light",
                       borderRadius: 2,
                       color: "primary.contrastText",
-                      transition:'all 0.3s ease',
-                      '&:hover': { backgroundColor: 'primary.main' }
+                      transition: "all 0.3s ease",
+                      "&:hover": { backgroundColor: "primary.main" },
                     }}
                   >
                     <UploadIcon />
@@ -79,10 +89,8 @@ export default function ImageUploader({ name, control, errors }) {
                   type="file"
                   accept="image/*"
                   hidden
-                  {...field} // Pass the rest of the field props
-                  value={value?.fileName} // Needed to clear the input
+                  // We don't need to spread the rest of the field props here for a file input
                   onChange={handleFileChange}
-                  required
                 />
               </ButtonBase>
               {errors[name] && (

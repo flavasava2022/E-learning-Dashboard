@@ -110,6 +110,7 @@ console.log("Updated profile:", profile);
       };
       }
     } catch (error) {
+        dispatch(showSnackbar({ message: error, severity: "error" }));
       return rejectWithValue(error.message);
     }
   }

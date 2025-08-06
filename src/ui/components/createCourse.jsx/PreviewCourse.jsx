@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { supabase } from "../../utils/supabase";
+import { useState } from "react";
+
 import {
   Box,
   Breadcrumbs,
@@ -22,87 +21,24 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import OndemandVideoOutlinedIcon from "@mui/icons-material/OndemandVideoOutlined";
-import { useDispatch } from "react-redux";
-import { showSnackbar } from "../../store/snackbarSlice";
 
-export default function CourseDetails() {
-  const id = useParams().slug;
-  const dispatch = useDispatch();
-  const [course, setCourse] = useState({});
+export default function PreviewCourse({ courseData }) {
   const [expanded, setExpanded] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const instructorName = `${course.users?.first_name ?? ""} ${course.users?.last_name ?? ""}`;
-  const lessonsCount = course?.modules?.reduce(
+
+  const lessonsCount = courseData?.modules?.reduce(
     (total, module) => total + (module?.lessons ? module.lessons?.length : 0),
     0
   );
   const TotalHours =
-    course?.modules
+    courseData?.modules
       ?.flatMap((module) => module.lessons)
       ?.reduce((sum, lesson) => sum + (lesson?.duration_minutes || 0), 0) / 60;
 
   const handleAccordionChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
-  useEffect(() => {
-    if (!id) return;
-    async function fetchData() {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("courses")
-        .select(
-          `
-      *,
-      categories (
-        name
-      ),
-      users (
-        first_name,last_name,avatar_url),
-      modules (
-        *,
-        lessons (
-          *
-        )
-      ),
-      enrollments (
-        user_id,
-        users (
-          first_name,
-          last_name,
-          avatar_url
-        )
-      )
-    `
-        )
-        .eq("id", id)
-        .single();
 
-      if (error) {
-        dispatch(showSnackbar({ message: error.message, severity: "error" }));
-        setCourse(null);
-      } else {
-        setCourse(data);
-      }
-      setLoading(false);
-    }
-    fetchData();
-  }, [id, dispatch]);
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!course) {
+  if (!courseData) {
     return <Typography>Course not found.</Typography>;
   }
   return (
@@ -121,7 +57,9 @@ export default function CourseDetails() {
         <Link underline="hover" color="inherit" href="/dashboard/courses">
           COURSES
         </Link>
-        <Typography sx={{ color: "text.primary" }}>{course?.title}</Typography>
+        <Typography sx={{ color: "text.primary" }}>
+          {courseData?.title}
+        </Typography>
       </Breadcrumbs>
       <Box
         sx={{
@@ -158,36 +96,12 @@ export default function CourseDetails() {
             }}
           >
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-              {course?.title}
+              {courseData?.title}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              {course?.description}
+              {courseData?.description}
             </Typography>
 
-            <Stack direction="row" alignItems="center" spacing={3}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Avatar
-                  src={course.users?.avatar_url}
-                  sx={{ borderRadius: "8px", width: 60, height: 60 }}
-                  alt={instructorName}
-                />
-                <Typography variant="body2" sx={{ color: "#2d9cdb" }}>
-                  {instructorName}
-                </Typography>
-              </Stack>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <PeopleAltOutlinedIcon fontSize="small" color="action" />
-                <Typography variant="body2" color="text.secondary">
-                  {course.enrollments?.length ?? 0}
-                </Typography>
-              </Stack>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <StarIcon fontSize="small" sx={{ color: "#ffb400" }} />
-                <Typography variant="body2" color="text.secondary">
-                  {course.rating ?? "N/A"}
-                </Typography>
-              </Stack>
-            </Stack>
             <Divider sx={{ width: "100%" }} />
           </Box>
           <Box
@@ -211,7 +125,7 @@ export default function CourseDetails() {
                   sx={{ display: { xs: "none", sm: "block" } }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  {course?.modules?.length ?? 0}
+                  {courseData?.modules?.length ?? 0}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -260,11 +174,10 @@ export default function CourseDetails() {
                 height: "100%",
               }}
             >
-              {course?.modules?.map((module) => (
+              {courseData?.modules?.map((module) => (
                 <Accordion
                   elevation={0}
-                  expanded={expanded === `panel-${module?.id}`}
-                  onChange={handleAccordionChange(`panel-${module.id}`)}
+
                   disableGutters
                   sx={{
                     width: "100%",
@@ -402,8 +315,8 @@ export default function CourseDetails() {
             className="border-1 border-gray-300"
           >
             <img
-              src={course.image_url}
-              alt={course.title}
+              src={courseData.image_url}
+              alt={courseData.title}
               style={{
                 // Conditional styling for the image
                 width: "100%",
@@ -421,12 +334,8 @@ export default function CourseDetails() {
               component="div"
               sx={{ fontWeight: "bold" }}
             >
-              ${course?.price?.toFixed(2)}
+              ${courseData?.price?.toFixed(2)}
             </Typography>
-
-            <Button variant="contained" sx={{ width: "100%" }}>
-              Buy Course Now
-            </Button>
           </Box>
 
           <Box
@@ -449,7 +358,7 @@ export default function CourseDetails() {
               <Stack direction="row" alignItems="center" spacing={1}>
                 <SchoolOutlinedIcon color="primary" />
                 <Typography variant="body2" color="text.primary">
-                  {course?.modules?.length ?? 0} Sections
+                  {courseData?.modules?.length ?? 0} Sections
                 </Typography>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={1}>
@@ -466,19 +375,16 @@ export default function CourseDetails() {
               </Stack>
 
               <Stack direction="row" alignItems="center" spacing={1}>
-                <PeopleAltOutlinedIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.primary">
-                  {course.enrollments?.length ?? 0} Enrolled
-                </Typography>
-              </Stack>
-              <Stack direction="row" alignItems="center" spacing={1}>
                 <StarIcon fontSize="small" sx={{ color: "#ffb400" }} />
                 <Typography variant="body2" color="text.secondary">
-                  {course.rating ?? "N/A"} Rating
+                  {courseData.rating ?? "N/A"} Rating
                 </Typography>
               </Stack>
             </Stack>
           </Box>
+          <Button variant="contained" sx={{ width: "100%" }}>
+            Publish Course
+          </Button>
         </Box>
       </Box>
     </Box>
