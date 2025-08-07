@@ -1,7 +1,10 @@
 import {
   Box,
   Breadcrumbs,
+  Button,
   CircularProgress,
+  DialogActions,
+  DialogContent,
   Link,
   Tab,
   Tabs,
@@ -14,23 +17,55 @@ import { useParams } from "react-router";
 import ContentContainer from "../../ui/components/createCourse.jsx/ContentContainer";
 import PreviewCourse from "../../ui/components/createCourse.jsx/PreviewCourse";
 import { showSnackbar } from "../../store/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import AlertModal from "../../ui/Modals/AlertModal";
 
 export default function CreateCourse() {
   const ContentContainer = lazy(
     () => import("../../ui/components/createCourse.jsx/ContentContainer")
   );
+  const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(0);
   const [breadcrumbsTitle, setBreadcrumbsTitle] = useState("");
   const [courseData, setCourseData] = useState(null);
+  const [alertModal, setAlertModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { courseId } = useParams();
   const dispatch = useDispatch();
   const isInitialLoad = useRef(true);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  async function changeCourseStatus() {
+    try {
+      setIsSubmitting(true);
+      const { data, error } = await supabase
+        .from("courses")
+        .update({ published: false })
+        .eq("id", courseId)
+        .select()
+        .single();
 
+      if (error) throw error;
+      if (data) {
+        dispatch(
+          showSnackbar({
+            message: "Your course status has been changed",
+            severity: "success",
+          })
+        );
+        setAlertModal(false);
+        setCourseData((pervState) => {
+          return { ...pervState, published: false };
+        });
+      }
+    } catch (error) {
+      dispatch(showSnackbar({ message: error.message, severity: "error" }));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   useEffect(() => {
     const fetchCourseData = async () => {
       setLoading(true);
@@ -52,7 +87,9 @@ export default function CreateCourse() {
         if (error) throw error;
 
         setCourseData(data);
-
+        if (data?.published) {
+          setAlertModal(true);
+        }
         if (isInitialLoad.current) {
           setValue(data?.edit_course_step || 0);
           isInitialLoad.current = false;
@@ -73,6 +110,11 @@ export default function CreateCourse() {
       setBreadcrumbsTitle(courseData?.title);
     }
   }, [courseData, value]);
+  useEffect(() => {
+    if (courseData?.id && user.id !== courseData?.instructor_id) {
+      throw Error;
+    }
+  }, [courseId, courseData?.instructor_id, user.id, courseData?.id]);
   return (
     <div
       className="w-full"
@@ -100,11 +142,11 @@ export default function CreateCourse() {
         value={value}
         onChange={handleChange}
         aria-label="basic tabs example"
-        sx={{ flexShrink: 0,mt:2 }}
+        sx={{ flexShrink: 0, mt: 2 }}
       >
-        <Tab label="1. Basic Info" />
-        <Tab label="2. content" />
-        <Tab label="3. Preview" />
+        <Tab label="1. Basic Info"  />
+        <Tab label="2. content" disabled={!courseId} />
+        <Tab label="3. Preview" disabled={!courseId} />
       </Tabs>
 
       <div
@@ -163,6 +205,38 @@ export default function CreateCourse() {
           </Suspense>
         )}
       </div>
+      {alertModal && (
+        <AlertModal
+          title={`This course is currently published!!`}
+          open={alertModal}
+          setOpen={setAlertModal}
+          action={changeCourseStatus}
+        >
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary">
+              This course is currently published and visible to students. If you
+              want to make changes, you can unpublish it to hide it from
+              students.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: "16px 24px" }}>
+            <Button onClick={() => setAlertModal(false)}>Disagree</Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={changeCourseStatus}
+              disabled={isSubmitting}
+              startIcon={
+                isSubmitting ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : null
+              }
+            >
+              Agree
+            </Button>
+          </DialogActions>
+        </AlertModal>
+      )}
     </div>
   );
 }

@@ -17,6 +17,7 @@ import Notification from "./pages/Dashboard/Settings/Notification";
 import CourseDetails from "./pages/Dashboard/CourseDetails";
 import MyCourses from "./pages/Dashboard/MyCourses";
 import CreateCourse from "./pages/Dashboard/CreateCourse";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
   const route = createBrowserRouter([
@@ -38,12 +39,13 @@ function App() {
           </SidebarProvider>
         </ProtectedRoute>
       ),
+      errorElement: <ErrorPage />, // Handle unauthorized access
       children: [
         { index: true, element: <Home /> },
         { path: "courses", element: <Courses /> },
         { path: "courses/:slug", element: <CourseDetails /> },
-                { path: "mycourses/", element: <MyCourses /> },
-                        {
+        { path: "mycourses/", element: <MyCourses /> },
+        {
           path: "/dashboard/mycourses/create/:courseId?",
           element: <CreateCourse />,
         },

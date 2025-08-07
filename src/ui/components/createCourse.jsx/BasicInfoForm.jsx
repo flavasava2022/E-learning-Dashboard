@@ -40,7 +40,10 @@ export default function BasicInfoForm({
   } = useForm({
     resolver: zodResolver(createCourseData),
     mode: "onChange",
-    defaultValues: courseData || {},
+    defaultValues: courseData || {
+      course_level: "beginner",
+      category_id: "5a279548-eee0-4c10-96f2-ca2be70a277f",
+    },
   });
   useEffect(() => {
     if (courseData) {

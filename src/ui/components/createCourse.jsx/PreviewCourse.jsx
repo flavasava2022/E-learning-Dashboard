@@ -14,6 +14,8 @@ import {
   Button,
   Paper,
   CircularProgress,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import StarIcon from "@mui/icons-material/Star";
@@ -21,10 +23,18 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import OndemandVideoOutlinedIcon from "@mui/icons-material/OndemandVideoOutlined";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../../../store/snackbarSlice";
+import { supabase } from "../../../utils/supabase";
+import AlertModal from "../../Modals/AlertModal";
+import { useNavigate } from "react-router";
 
 export default function PreviewCourse({ courseData }) {
   const [expanded, setExpanded] = useState(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [congratsModal, setCongratsModal] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const lessonsCount = courseData?.modules?.reduce(
     (total, module) => total + (module?.lessons ? module.lessons?.length : 0),
     0
@@ -37,7 +47,35 @@ export default function PreviewCourse({ courseData }) {
   const handleAccordionChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+  async function publishCourse() {
+    setIsSubmitting(true);
+    try {
+      const { data, error } = await supabase
+        .from("courses")
+        .update({
+          published: true,
+          edit_course_step: courseData?.edit_course_step + 1,
+        })
+        .eq("id", courseData?.id)
+        .select()
+        .single();
 
+      if (error) throw error;
+      if (data) {
+        dispatch(
+          showSnackbar({
+            message: "Your course status has been changed",
+            severity: "success",
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(showSnackbar({ message: error.message, severity: "error" }));
+    } finally {
+      setIsSubmitting(false);
+      setCongratsModal(true);
+    }
+  }
   if (!courseData) {
     return <Typography>Course not found.</Typography>;
   }
@@ -177,7 +215,8 @@ export default function PreviewCourse({ courseData }) {
               {courseData?.modules?.map((module) => (
                 <Accordion
                   elevation={0}
-
+                  expanded={expanded === `panel-${module?.id}`}
+                  onChange={handleAccordionChange(`panel-${module?.id}`)}
                   disableGutters
                   sx={{
                     width: "100%",
@@ -231,6 +270,7 @@ export default function PreviewCourse({ courseData }) {
                       <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
                         {module?.lessons.map((lesson) => (
                           <Paper
+                            key={lesson?.id}
                             variant="outlined"
                             sx={{
                               display: "flex",
@@ -382,11 +422,47 @@ export default function PreviewCourse({ courseData }) {
               </Stack>
             </Stack>
           </Box>
-          <Button variant="contained" sx={{ width: "100%" }}>
+          <Button
+            onClick={publishCourse}
+            disabled={isSubmitting || courseData?.published}
+            startIcon={
+              isSubmitting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : null
+            }
+            variant="contained"
+            sx={{ width: "100%" }}
+          >
             Publish Course
           </Button>
         </Box>
       </Box>
+      {congratsModal && (
+        <AlertModal
+          open={congratsModal}
+          setOpen={setCongratsModal}
+          title={"Congrats"}
+        >
+          <DialogContent>
+            <Typography variant="h6" gutterBottom>
+              Your course has been published successfully!
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              You can now view your course in the dashboard and start enrolling
+              students.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: "16px 24px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/dashboard")}
+            >
+              Dashboard
+            </Button>
+          </DialogActions>
+        </AlertModal>
+      )}
     </Box>
   );
 }

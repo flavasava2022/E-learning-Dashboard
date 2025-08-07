@@ -176,7 +176,6 @@ export default function ContentContainer({ courseData, setValue }) {
               sx={{
                 width: { xs: "100%", sm: "fit-content" },
                 mt: 2,
-                alignSelf: "end",
                 gap: 2,
               }}
               onClick={() => setValue((pervState) => pervState - 1)}
@@ -184,13 +183,13 @@ export default function ContentContainer({ courseData, setValue }) {
               Back
             </Button>
             <Button
-              variant="contained"
               sx={{
                 width: { xs: "100%", sm: "fit-content" },
                 mt: 2,
-                alignSelf: "end",
+                gap: 2,
               }}
               onClick={() => setValue((pervState) => pervState + 1)}
+              variant="contained"
             >
               Preview
             </Button>
