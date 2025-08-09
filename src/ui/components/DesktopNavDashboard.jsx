@@ -16,7 +16,7 @@ import { ListItemButton } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../store/userSlice";
 import { Fragment } from "react";
-
+import { motion, AnimatePresence } from "framer-motion";
 export default function DesktopNavDashboard({ role }) {
   const { isOpen } = useSidebar();
   const location = useLocation();
@@ -65,12 +65,9 @@ export default function DesktopNavDashboard({ role }) {
   ];
   return (
     <List
+      component={motion.div}
       sx={{
-        // Change background color of the whole List (drawer)
-                minWidth: isOpen ? "250px" : "70px",
-
-        transition: "min-width 0.3s ease",
-        bgcolor: "#32323f",
+        background: "#32323f",
         height: "100%",
         boxShadow: 3,
 
@@ -82,7 +79,10 @@ export default function DesktopNavDashboard({ role }) {
           my: 0.5,
         },
       }}
-      className="relative"
+      animate={{
+        width: isOpen ? "250px" : "70px",
+      }}
+      transition={{ type: "tween" }}
     >
       {menuItems
         .filter((section) => section?.show)
@@ -90,7 +90,7 @@ export default function DesktopNavDashboard({ role }) {
           <Fragment key={index}>
             <ListSubheader
               sx={{
-                bgcolor: "inherit",
+                background: "inherit",
                 color: "white",
                 fontWeight: "bold",
                 textAlign: "center",
@@ -110,7 +110,7 @@ export default function DesktopNavDashboard({ role }) {
                   sx={{
                     color: "white",
                     "&.Mui-selected, &.Mui-selected:hover": {
-                      bgcolor: "#2d9cdb",
+                      background: "#2d9cdb",
                       color: "#ffffff",
                     },
                     "& .MuiListItemIcon-root": {
@@ -119,7 +119,7 @@ export default function DesktopNavDashboard({ role }) {
                       color: "white",
                     },
                     "&:hover": {
-                      bgcolor: "#ffbf00",
+                      background: "#ffbf00",
                       color: "primary.main",
                       "& .MuiListItemIcon-root": { color: "primary.main" },
                     },
@@ -132,13 +132,25 @@ export default function DesktopNavDashboard({ role }) {
                   }
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    sx={{
-                      display: isOpen ? "block" : "none",
-                      transition: "display 0.3s ease",
-                    }}
-                  />
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        key={`text-${item.text}`}
+                        initial={{ opacity: 0, x: -20, display: "none" }}
+                        animate={
+                          isOpen && { opacity: 1, x: 0, display: "block" }
+                        }
+                        exit={{ opacity: 0, x: -20, display: "none" }}
+                        transition={{ duration: 0.2, delay: 0.1 }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <ListItemText
+                          primary={item.text}
+                          sx={{ whiteSpace: "nowrap" }} // Prevent text wrapping
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </ListItemButton>
               </Tooltip>
             ))}

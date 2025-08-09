@@ -92,7 +92,7 @@ export default function BasicInfoForm({
         }
       } else {
         // --- CREATE MODE ---
-        console.log("Creating new course...");
+
         const { data, error } = await supabase
           .from("courses")
           .insert({ ...payload, instructor_id: user?.id })

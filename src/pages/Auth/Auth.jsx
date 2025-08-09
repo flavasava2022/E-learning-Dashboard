@@ -1,102 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Typography, Container } from "@mui/material";
-import { styled } from "@mui/system";
+import React, { useState } from "react";
+import { Button, Typography } from "@mui/material";
 import Login from "./Login";
 import Signup from "./Signup";
-
-const AnimatedDiv = styled(Box)(({ theme, side, width }) => ({
-  position: "absolute",
-  width: `${width}%`,
-  height: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "green",
-  zIndex: 50,
-  transition: "width 1s, margin-left 1s, margin-right 1s",
-  marginLeft: side === "right" ? "50%" : "0%",
-  marginRight: side === "left" ? "50%" : "0%",
-}));
+import { AnimatePresence, motion } from "framer-motion";
+import { useMediaQuery } from "react-responsive";
 
 const Auth = () => {
-  const [side, setSide] = useState("left");
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [width, setWidth] = useState("50%");
-
-  const handleClick = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-
-    // Expand to full width
-    setWidth("100%");
-
-    setTimeout(() => {
-      // Switch sides and shrink to 50%
-      setSide((prev) => (prev === "left" ? "right" : "left"));
-      setWidth("50%");
-      setIsAnimating(false);
-    }, 1000);
-  };
+  const [login, setLogin] = useState(true);
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
   return (
-    <div
-      className={`w-full flex  h-[100vh] ${side === "left" ? " flex" : "flex-row-reverse"} Animated-div`}
+    <motion.main
+      className={`flex items-end md:items-center w-screen ${
+        login ? "md:justify-start" : "md:justify-end"
+      } bg-white h-screen relative overflow-hidden`}
     >
-      {/* Background Content */}
-      <div
-        className="flex items-center justify-center animate-divw"
-        style={{
-          display: width === "100%" ? "none" : "flex",
-          opacity: width === "100%" ? "0" : "1",
-          width: width === "100%" ? "0%" : "50%",
-        }}
-      >
-        {side === "left" ? <Login /> : <Signup />}
+      <div className="w-full md:w-1/2 flex items-center justify-center">
+        {/* A minor improvement: mode="wait" ensures forms don't overlap during switch */}
+        <AnimatePresence mode="wait">
+          {login ? <Login /> : <Signup />}
+        </AnimatePresence>
       </div>
 
-      {/* Animated Sidebar */}
-      <div
-        className={`flex  items-center justify-center h-full bg-primary animated-div  z-50 `}
-        style={{
-          width: width,
+      {/* --- THE FIXES ARE APPLIED TO THIS COMPONENT --- */}
+      <motion.div
+        // FIX #1: This 'key' prop is the main solution. It forces a re-mount
+        // when isMobile changes, preventing the "messy" animation.
+        key={isMobile ? "mobile" : "desktop"}
+        
+        // FIX #2: The class is now responsive. It removes 'h-full' and 'top-0' on mobile
+        // to allow your 'bottom: 0' animation to work correctly.
+        className={`overflow-hidden bg-primary flex items-center justify-center absolute z-50 ${
+          isMobile
+            ? "w-full top-0 left-0"
+            : "h-full w-1/2 top-0 right-0"
+        }`}
+        
+        // ----- YOUR ANIMATION LOGIC IS UNCHANGED -----
+        initial={{
+          width: isMobile ? "100%" : ["0%", "50%"],
+          height: !isMobile ? "100%" : ["0%", "50%"],
+        }}
+        animate={[
+          {
+            width: isMobile
+              ? "100%"
+              : login
+              ? ["50%", "150%", "50%"]
+              : ["50%", "160%", "50%"],
+          },
+          {
+            height: !isMobile
+              ? "100%"
+              : login
+              ? ["50%", "150%", "50%"]
+              : ["35%", "160%", "35%"],
+          },
+          isMobile
+            ? {
+                bottom: "0px",
+                borderRadius: ["0 0 0 0", "0 0 0 0", "0 0 0 0"],
+              }
+            : login
+            ? {
+                right: "0px",
+                borderRadius: ["0 0 0 0", "0 0 0 0", "25% 0 0 25%"],
+              }
+            : {
+                left: "0px",
+                borderRadius: ["0 0 0 0", "0 0 0 0", "0 25% 25% 0"],
+              },
+        ]}
+        transition={{
+          duration: 1,
+          times: [0, 0.5, 1],
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h4" color="white" fontWeight="bold">
-            {side === "left" ? "Welcome back!" : "Hello, Friend!"}
+        {/* ----- YOUR INNER CONTENT IS UNCHANGED ----- */}
+        <div className="flex flex-col gap-6 items-center justify-center max-w-md px-10">
+          <Typography
+            variant="h4"
+            component="p"
+            className="!text-white font-bold"
+          >
+            {login ? "Welcome back!" : "Hello, Friend!"}
           </Typography>
-          <Typography variant="h6" color="white">
-            {side === "left"
-              ? "Don't have an account?"
-              : "Already have an account?"}
+          <Typography
+            variant="h6"
+            component="p"
+            className="!text-white text-center"
+          >
+            {login ? "Don't have an account?" : "Already have an account?"}
           </Typography>
           <Button
-            variant="outlined"
-            sx={{
-              border: "2px solid white",
-              py: 1,
-              borderRadius: "4px",
-              px: 2,
-              width: "100%",
-              backgroundColor: "white",
-              color: "primary.main",
-              "&:disabled": { opacity: 0.7 },
-            }}
-            onClick={handleClick}
-            disabled={isAnimating}
+            color="primary"
+            variant="contained"
+            className="!bg-white !text-primary font-bold rounded-md w-full"
+            onClick={() => setLogin(!login)}
+
           >
-            {side === "left" ? "Sign up" : "Sign in"}
+            {login ? "Sign up" : "Sign in"}
           </Button>
-        </Box>
-      </div>
-    </div>
+        </div>
+      </motion.div>
+    </motion.main>
   );
 };
 

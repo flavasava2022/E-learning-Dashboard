@@ -112,7 +112,6 @@ export default function EnrolledCourses() {
           </IconButton>
         );
       },
- 
 
       headerAlign: "center",
       align: "center",
@@ -139,12 +138,12 @@ export default function EnrolledCourses() {
         const { data: coursesData, error: coursesError } = await supabase
           .from("courses")
           .select(
-            `id, title, users(first_name, last_name), progress(lesson_id), modules(lessons(id))`
+            `id, title, users(first_name, last_name), progress(lesson_id,user_id), modules(lessons(id))`
           )
           .in("id", courseIds);
 
         if (coursesError) throw coursesError;
-
+        console.log("courseData", coursesData);
         const rows = enrollments
           .map((enrollment) => {
             const course = coursesData.find(
@@ -156,7 +155,7 @@ export default function EnrolledCourses() {
               (acc, module) => acc + (module.lessons?.length || 0),
               0
             );
-            const completedLessons = course.progress?.length || 0;
+            const completedLessons = course.progress?.filter(progress=>progress?.user_id === user?.id)?.length || 0;
 
             const progressPercentage =
               totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;

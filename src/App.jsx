@@ -18,6 +18,7 @@ import CourseDetails from "./pages/Dashboard/CourseDetails";
 import MyCourses from "./pages/Dashboard/MyCourses";
 import CreateCourse from "./pages/Dashboard/CreateCourse";
 import ErrorPage from "./pages/ErrorPage";
+import CoursePage from "./pages/Dashboard/CoursePage";
 
 function App() {
   const route = createBrowserRouter([
@@ -45,6 +46,7 @@ function App() {
         { path: "courses", element: <Courses /> },
         { path: "courses/:slug", element: <CourseDetails /> },
         { path: "mycourses/", element: <MyCourses /> },
+        { path: "/dashboard/course/:courseId/learn", element: <CoursePage /> },
         {
           path: "/dashboard/mycourses/create/:courseId?",
           element: <CreateCourse />,

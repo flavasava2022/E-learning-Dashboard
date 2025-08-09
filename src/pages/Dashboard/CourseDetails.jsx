@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { supabase } from "../../utils/supabase";
 import {
   Box,
@@ -22,15 +22,18 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import OndemandVideoOutlinedIcon from "@mui/icons-material/OndemandVideoOutlined";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../../store/snackbarSlice";
 
 export default function CourseDetails() {
   const id = useParams().slug;
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [course, setCourse] = useState({});
   const [expanded, setExpanded] = useState(null);
+  const [enrolled, setEnrolled] = useState();
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const instructorName = `${course.users?.first_name ?? ""} ${course.users?.last_name ?? ""}`;
   const lessonsCount = course?.modules?.reduce(
     (total, module) => total + (module?.lessons ? module.lessons?.length : 0),
@@ -44,14 +47,39 @@ export default function CourseDetails() {
   const handleAccordionChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+  async function enroll() {
+    try {
+      const { data, error } = await supabase
+        .from("enrollments")
+        .insert({ course_id: course?.id, user_id: user?.id })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        dispatch(
+          showSnackbar({
+            message:
+              "Congratulations! You have successfully enrolled in the course.",
+            severity: "success",
+          })
+        );
+        setEnrolled(true);
+        navigate(`/dashboard/course/${course?.id}/learn`);
+      }
+    } catch (error) {
+      dispatch(showSnackbar({ message: error.message, severity: "error" }));
+    }
+  }
   useEffect(() => {
     if (!id) return;
     async function fetchData() {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("courses")
-        .select(
-          `
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("courses")
+          .select(
+            `
       *,
       categories (
         name
@@ -73,20 +101,28 @@ export default function CourseDetails() {
         )
       )
     `
-        )
-        .eq("id", id)
-        .single();
+          )
+          .eq("id", id)
+          .single();
 
-      if (error) {
+        if (error) throw error;
+
+        if (data) {
+          data?.enrollments?.map((student) => {
+            if (student?.user_id == user?.id) {
+              setEnrolled(true);
+            }
+          });
+          setCourse(data);
+        }
+      } catch (error) {
         dispatch(showSnackbar({ message: error.message, severity: "error" }));
-        setCourse(null);
-      } else {
-        setCourse(data);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchData();
-  }, [id, dispatch]);
+  }, [id, dispatch, user]);
   if (loading) {
     return (
       <Box
@@ -133,6 +169,7 @@ export default function CourseDetails() {
           minHeight: 0,
           height: "100%",
           overflow: { xs: "auto" },
+          width: "100%",
         }}
       >
         {/* Left Pane (Main Content) */}
@@ -145,6 +182,7 @@ export default function CourseDetails() {
             gap: "30px",
             flexGrow: 1,
             height: { sm: "100%" },
+            width: { xs: "100%", md: "auto" },
           }}
         >
           <Box
@@ -160,7 +198,14 @@ export default function CourseDetails() {
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               {course?.title}
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography
+              variant="subtitle1"
+              color="text.secondary"
+              sx={{
+                wordBreak: "break-word",
+                minWidth: 0,
+              }}
+            >
               {course?.description}
             </Typography>
 
@@ -199,7 +244,7 @@ export default function CourseDetails() {
               gap: "20px",
               width: "100%",
               height: "100%",
-              overflow: { sm: "auto" },
+              overflowY: { xs: "auto" },
             }}
           >
             <Typography variant="h5"> Course Content</Typography>
@@ -255,7 +300,7 @@ export default function CourseDetails() {
             <Box
               sx={{
                 width: "100%",
-                overflow: { sm: "auto" },
+                overflowY: { xs: "auto" },
                 minHeight: 0,
                 height: "100%",
               }}
@@ -268,7 +313,7 @@ export default function CourseDetails() {
                   disableGutters
                   sx={{
                     width: "100%",
-
+                    mb: 1,
                     border: "1px solid",
                     borderColor: "divider",
                     borderRadius: 2,
@@ -319,7 +364,9 @@ export default function CourseDetails() {
                         {module?.lessons.map((lesson) => (
                           <Paper
                             variant="outlined"
+                            key={lesson?.id}
                             sx={{
+                              width: "100%",
                               display: "flex",
                               alignItems: "center",
                               p: 1,
@@ -424,8 +471,16 @@ export default function CourseDetails() {
               ${course?.price?.toFixed(2)}
             </Typography>
 
-            <Button variant="contained" sx={{ width: "100%" }}>
-              Buy Course Now
+            <Button
+              onClick={
+                enrolled
+                  ? () => navigate(`/dashboard/course/${course?.id}/learn`)
+                  : enroll
+              }
+              variant="contained"
+              sx={{ width: "100%" }}
+            >
+              {enrolled ? "Go to course" : "Buy Course Now"}
             </Button>
           </Box>
 
