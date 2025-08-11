@@ -4,18 +4,18 @@ export function getNextLesson(course, progressData) {
 
   // Get last completed lesson record
   const lastProgress = progressData;
-  const lastLessonId = lastProgress.id;
-  const lastModuleId = lastProgress.module_id;
+  const lastLessonId = lastProgress?.id;
+  const lastModuleId = lastProgress?.module_id;
 
   // Find the module where the last lesson was completed
-  const currentModule = course.modules.find((m) => m.id === lastModuleId);
+  const currentModule = course?.modules?.find((m) => m.id === lastModuleId);
   if (!currentModule) return null;
 
   // Sort lessons in the module by position (to be safe)
-  const sortedLessons = currentModule.lessons || [];
+  const sortedLessons = currentModule?.lessons || [];
 
   // Find the index of the last completed lesson in that module
-  const lessonIndex = sortedLessons.findIndex((l) => l.id === lastLessonId);
+  const lessonIndex = sortedLessons?.findIndex((l) => l.id === lastLessonId);
   const lessonData = sortedLessons[lessonIndex] || null;
 
   // Try to get the next lesson in the current module
@@ -24,14 +24,14 @@ export function getNextLesson(course, progressData) {
   }
 
   // If there is no next lesson in current module, find the next module by position
-  const sortedModules = course.modules;
+  const sortedModules = course?.modules;
   const moduleIndex = sortedModules.findIndex((m) => m.id === lastModuleId);
 
   if (moduleIndex !== -1 && moduleIndex + 1 < sortedModules.length) {
     const nextModule = sortedModules[moduleIndex + 1];
     const nextModuleLessons = nextModule.lessons || [];
 
-    return nextModuleLessons.length > 0 ? nextModuleLessons[0] : lessonData;
+    return nextModuleLessons?.length > 0 ? nextModuleLessons[0] : lessonData;
   }
   // No next lesson available
   return lessonData;
