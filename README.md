@@ -1,7 +1,5 @@
 # E-learning Dashboard
 
-![E-learning Dashboard](https://placehold.co/800x400/334155/e2e8f0?text=E-learning%20Dashboard)
-
 A modern, feature-rich dashboard for online learning platforms. This application provides a seamless experience for both instructors and students to manage courses, track progress, and customize their learning environment.
 
 ## ✨ Key Features
