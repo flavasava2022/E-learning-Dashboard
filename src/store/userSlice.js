@@ -2,15 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../utils/supabase";
 import { showSnackbar } from "./snackbarSlice";
 
-// src/features/auth/authSlice.js
-
 export const signupUser = createAsyncThunk(
   "auth/signup",
-  async ({ formData }, { rejectWithValue,dispatch  }) => {
+  async ({ formData }, { rejectWithValue, dispatch }) => {
     try {
       // 1. Sign up the user
       const { data, error } = await supabase.auth.signUp({
-        email:formData?.email,
+        email: formData?.email,
         password: formData?.password,
         options: {
           data: {
@@ -21,11 +19,9 @@ export const signupUser = createAsyncThunk(
         },
       });
       if (error) {
-        dispatch(showSnackbar({ message: error.message, severity: 'error' }));
+        dispatch(showSnackbar({ message: error.message, severity: "error" }));
         throw error;
       }
-
-
 
       // Fetch user role from profiles table
       const { data: profile } = await supabase
@@ -33,7 +29,12 @@ export const signupUser = createAsyncThunk(
         .select("*")
         .eq("id", data.user.id)
         .single();
-        dispatch(showSnackbar({ message: `Welcome back ${profile?.first_name}`, severity: 'success' }));
+      dispatch(
+        showSnackbar({
+          message: `Welcome back ${profile?.first_name}`,
+          severity: "success",
+        })
+      );
       return {
         user: profile,
         role: profile?.role || "student", // Default role
@@ -44,31 +45,28 @@ export const signupUser = createAsyncThunk(
   }
 );
 export const logoutUser = createAsyncThunk(
-    "auth/logout",
-    async (_, { rejectWithValue }) => {
-      try {
-
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-
-      
-      } catch (error) {
-        return rejectWithValue(error.message);
-      }
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-  );
-  
+  }
+);
+
 // Async thunk for login
 export const loginUser = createAsyncThunk(
   "auth/login",
-  async ({ formData }, { rejectWithValue,dispatch }) => {
+  async ({ formData }, { rejectWithValue, dispatch }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
       });
       if (error) {
-        dispatch(showSnackbar({ message: error.message, severity: 'error' }));
+        dispatch(showSnackbar({ message: error.message, severity: "error" }));
         throw error;
       }
 
@@ -79,7 +77,12 @@ export const loginUser = createAsyncThunk(
         .eq("id", data.user.id)
         .single();
 
-        dispatch(showSnackbar({ message: `Welcome back ${profile?.first_name}`, severity: 'success' }));
+      dispatch(
+        showSnackbar({
+          message: `Welcome back ${profile?.first_name}`,
+          severity: "success",
+        })
+      );
       return {
         user: profile,
         role: profile?.role || "student", // Default role
@@ -91,26 +94,32 @@ export const loginUser = createAsyncThunk(
 );
 export const changeUserData = createAsyncThunk(
   "user/ChangeUserData",
-  async ({ formData,id }, { rejectWithValue,dispatch }) => {
+  async ({ formData, id }, { rejectWithValue, dispatch }) => {
     try {
-
-
       // Fetch user role from profiles table
-      const { data: profile,error } = await supabase.from('users').update(formData)
+      const { data: profile, error } = await supabase
+        .from("users")
+        .update(formData)
         .eq("id", id)
-.select()
-        if(error) {
-          dispatch(showSnackbar({ message: error.message, severity: 'error' }));
-                throw error;}
-console.log("Updated profile:", profile);
-      if(profile) {
-  dispatch(showSnackbar({ message: `Changes Saved Successfully`, severity: 'success' }));
-      return {
-        user: profile[0], // Return the updated user profile
-      };
+        .select();
+      if (error) {
+        dispatch(showSnackbar({ message: error.message, severity: "error" }));
+        throw error;
+      }
+
+      if (profile) {
+        dispatch(
+          showSnackbar({
+            message: `Changes Saved Successfully`,
+            severity: "success",
+          })
+        );
+        return {
+          user: profile[0], // Return the updated user profile
+        };
       }
     } catch (error) {
-        dispatch(showSnackbar({ message: error, severity: "error" }));
+      dispatch(showSnackbar({ message: error, severity: "error" }));
       return rejectWithValue(error.message);
     }
   }
@@ -118,8 +127,7 @@ console.log("Updated profile:", profile);
 // Async thunk for session check
 export const checkSession = createAsyncThunk(
   "auth/checkSession",
-  async (_, { rejectWithValue,dispatch }) => {
-
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       const { data, error } = await supabase.auth.getSession();
 
@@ -132,8 +140,12 @@ export const checkSession = createAsyncThunk(
         .eq("id", data.session.user.id)
         .single();
 
-
-        dispatch(showSnackbar({ message: `Welcome back ${profile?.first_name}`, severity: 'success' }));
+      dispatch(
+        showSnackbar({
+          message: `Welcome back ${profile?.first_name}`,
+          severity: "success",
+        })
+      );
       return {
         user: profile,
         role: profile?.role || "student",
@@ -154,9 +166,7 @@ const authSlice = createSlice({
     isInitialized: false, // Track initialization
     error: null,
   },
-  reducers: {
-
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
@@ -170,13 +180,13 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      })      .addCase(changeUserData.pending, (state) => {
+      })
+      .addCase(changeUserData.pending, (state) => {
         state.status = "loading";
       })
       .addCase(changeUserData.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.user = action.payload.user;
-
       })
       .addCase(changeUserData.rejected, (state, action) => {
         state.status = "failed";
@@ -201,16 +211,19 @@ const authSlice = createSlice({
       })
       .addCase(checkSession.rejected, (state) => {
         state.isInitialized = true;
-      }).addCase(logoutUser.pending, (state) => {
+      })
+      .addCase(logoutUser.pending, (state) => {
         state.status = "loading";
-      }).addCase(logoutUser.fulfilled, (state) => {
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
         state.status = "succeeded";
         state.user = null;
         state.role = null;
-      }).addCase(logoutUser.rejected, (state, action) => {
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      })
+      });
   },
 });
 

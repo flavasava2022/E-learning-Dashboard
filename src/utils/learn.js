@@ -1,5 +1,4 @@
 export function getNextLesson(course, progressData) {
-  console.log(progressData, course);
   if (!course || !progressData) return null;
 
   // Get last completed lesson record
