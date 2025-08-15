@@ -144,5 +144,6 @@ export default function useCourseData({ courseId, user }) {
     handleCheckbox,
     enrolled,
     setEnrolled,
+    setData,
   };
 }

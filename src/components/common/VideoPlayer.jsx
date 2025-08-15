@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { useDispatch, useSelector } from "react-redux";
-import { supabase } from "../../../utils/supabase";
+import { supabase } from "../../utils/supabase";
 import { useSearchParams } from "react-router";
-import { showSnackbar } from "../../../store/snackbarSlice";
+import { showSnackbar } from "../../store/snackbarSlice";
 import { Box, CircularProgress, Skeleton, Typography } from "@mui/material";
-import { getNextLesson } from "../../../utils/learn";
+import { getNextLesson } from "../../utils/learn";
 
 const VideoPlayer = ({
   courseId,
   setLastLesson,
-  setProgressCheckboxes,
-  progressCheckboxes,
+  progressSet,
   course,
   lastLesson,
   setExpanded,
+  setData,
 }) => {
   const user = useSelector((state) => state.auth.user);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,7 +26,7 @@ const VideoPlayer = ({
   const [isPlaying, setIsPlaying] = useState(true);
   async function handleVideoEnd() {
     try {
-      if (!progressCheckboxes[lesson?.id]) {
+      if (!progressSet.has(lesson?.id)) {
         const { data, error } = await supabase
           .from("progress")
           .insert({
@@ -40,19 +40,19 @@ const VideoPlayer = ({
           .single();
         if (error) throw error;
         if (data) {
-          setProgressCheckboxes((pervState) => ({
-            ...pervState,
-            [lesson?.id]: true,
-          }));
+          const prevProgress = course.progress || [];
+          const newProgress = [...prevProgress, { lesson_id: data?.lesson_id }];
+          setData((prev) => ({ ...prev, progress: newProgress }));
         }
       }
     } catch (error) {
       dispatch(showSnackbar({ message: error.message, severity: "error" }));
     } finally {
       const nextLesson = getNextLesson(course, lastLesson);
+
       if (searchParams.get("lesson") !== nextLesson?.id) {
         setSearchParams((current) => {
-          current.set("lesson", nextLesson.id);
+          current.set("lesson", nextLesson?.id);
           return current;
         });
         setExpanded(`panel-${nextLesson?.module_id}`);
@@ -66,7 +66,6 @@ const VideoPlayer = ({
       setLoading(true);
       setError("");
       setLesson(null);
-      // Handle case where no lesson is selected
       if (!lessonId || lessonId === "undefined") {
         setError("Please select a lesson to begin. 🚀");
         setLoading(false);

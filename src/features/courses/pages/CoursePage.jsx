@@ -22,15 +22,15 @@ import OndemandVideoOutlinedIcon from "@mui/icons-material/OndemandVideoOutlined
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import dayjs from "dayjs";
-import AlertModal from "../../ui/Modals/AlertModal";
-import VideoPlayer from "../../ui/components/common/VideoPlayer";
+import AlertModal from "../../../components/common/AlertModal";
+import VideoPlayer from "../../../components/common/VideoPlayer";
 import { useParams, useSearchParams } from "react-router";
 import { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { supabase } from "../../../utils/supabase";
 import { showSnackbar } from "../../../store/snackbarSlice";
 import { findLessonById, getNextLesson } from "../../../utils/learn";
-import useCourseData from "../../hooks/useCourseData";
+import useCourseData from "../hooks/useCourseData";
 
 export default function CoursePage() {
   const { courseId } = useParams();
@@ -52,9 +52,10 @@ export default function CoursePage() {
     loading,
     enrolled,
     setEnrolled,
+    setData,
   } = useCourseData({ courseId, user });
-  console.log(data);
   // Select lesson on first load
+  console.log(data);
   const TotalHours =
     data?.modules
       ?.flatMap((module) => module.lessons)
@@ -116,7 +117,7 @@ export default function CoursePage() {
       })();
     }
   }, [data, totalLessons, courseId, dispatch, user.id, setEnrolled, enrolled]);
-  if (!loading && enrolled) {
+  if (!loading && !enrolled) {
     throw new Response(null, {
       status: 401,
       statusText: "User not Enrolled in this course",
@@ -163,9 +164,11 @@ export default function CoursePage() {
             <VideoPlayer
               courseId={courseId}
               setLastLesson={setLastLesson}
-              course={data?.course}
+              course={data}
               lastLesson={lastLesson}
               setExpanded={setExpanded}
+              progressSet={progressSet}
+              setData={setData}
             />
 
             <Box
@@ -296,7 +299,7 @@ export default function CoursePage() {
                   ? dayjs(
                       data?.progress[data?.progress.length - 1]?.completed_at
                     ).format("MMM D, YYYY")
-                  : "N/A"}
+                  : dayjs(new Date()).format("MMM D, YYYY")}
               </Typography>
             </Box>
 
