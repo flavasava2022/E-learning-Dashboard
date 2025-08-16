@@ -55,7 +55,6 @@ export default function CoursePage() {
     setData,
   } = useCourseData({ courseId, user });
   // Select lesson on first load
-  console.log(data);
   const TotalHours =
     data?.modules
       ?.flatMap((module) => module.lessons)

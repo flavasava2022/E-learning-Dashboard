@@ -26,7 +26,6 @@ export default function PopularCoursesContainer() {
 
     fetchCourses();
   }, []);
-  console.log(courses);
   return (
     <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
       {courses.length > 0 ? (

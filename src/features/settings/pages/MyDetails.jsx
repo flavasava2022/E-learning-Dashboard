@@ -20,7 +20,6 @@ export default function MyDetails() {
   const user = useSelector((state) => state?.auth?.user);
   const [avatarSrc, setAvatarSrc] = useState(user?.avatar_url || undefined);
   const [avatarDirty, setAvatarDirty] = useState(false);
-  console.log("User Details:", user);
   const handleAvatarChange = (event) => {
     const file = event.target.files?.[0];
     if (file) {

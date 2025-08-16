@@ -143,7 +143,6 @@ export default function EnrolledCourses() {
           .in("id", courseIds);
 
         if (coursesError) throw coursesError;
-        console.log("courseData", coursesData);
         const rows = enrollments
           .map((enrollment) => {
             const course = coursesData.find(

@@ -38,7 +38,6 @@ export function getNextLesson(course, progressData) {
 
 export function findLessonById(course, lessonId) {
   if (!course || !lessonId) return;
-  console.log(lessonId);
   for (const module of course.modules) {
     const lesson = module.lessons.find((lesson) => lesson.id === lessonId);
     if (lesson) {

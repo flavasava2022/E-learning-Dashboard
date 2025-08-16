@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { supabase } from "../../utils/supabase";
 import dayjs from "dayjs";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export default function StudyStatistics() {
   const user = useSelector((state) => state.auth.user);
@@ -57,7 +57,7 @@ export default function StudyStatistics() {
   }, [user]);
 
   return (
-    <>
+    <Box>
       <Typography variant="h5" sx={{ fontWeight: "bold" }}>
         Study Statistics
       </Typography>
@@ -80,6 +80,6 @@ export default function StudyStatistics() {
         height={300}
         loading={loading}
       />
-    </>
+    </Box>
   );
 }

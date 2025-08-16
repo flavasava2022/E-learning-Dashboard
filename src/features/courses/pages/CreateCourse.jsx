@@ -109,10 +109,13 @@ export default function CreateCourse() {
     }
   }, [courseData, value]);
   useEffect(() => {
-    if (courseData?.id && user.id !== courseData?.instructor_id) {
-      throw Error;
+    if (courseData?.id && user.id !== courseData?.instructor_id|| user?.role !== 'instructor') {
+    throw new Response(null, {
+      status: 401,
+      statusText: "You are not authorized to enter this page.",
+    });
     }
-  }, [courseId, courseData?.instructor_id, user.id, courseData?.id]);
+  }, [courseId, courseData?.instructor_id, user, courseData?.id]);
   return (
     <div
       className="w-full"
