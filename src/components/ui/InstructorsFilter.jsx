@@ -1,45 +1,55 @@
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import {
+  Checkbox,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { useSearchParams } from "react-router";
 import { supabase } from "../../utils/supabase";
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 export default function InstructorsFilter() {
   const [items, setItems] = useState([]);
   const [checked, setChecked] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
+  const [personName, setPersonName] = useState([]);
   const handleChange = (event) => {
-    const newValues = {
-      ...checked,
-      [event.target.name]: event.target.checked,
-    };
-    const instructor = Object.keys(newValues).filter(
-      (key) => newValues[key] === true
-    );
-    if (instructor.length > 0) {
+    const { value } = event.target;
+    setPersonName(typeof value === "string" ? value.split(",") : value);
+
+
+    if (value.length > 0) {
       setSearchParams((current) => {
         const params = new URLSearchParams(current);
-        params.delete("instructor"); // Remove previous values
+        params.delete("instructor");
 
-        // Add each category as its own query param
-        instructor.forEach((instructor) => {
-          params.append("instructor", instructor);
+        value.forEach((instructorId) => {
+          params.append("instructor", instructorId);
         });
         return params;
       });
     } else {
       setSearchParams((current) => {
         const params = new URLSearchParams(current);
-        params.delete("instructor");
+        params.delete("instructor"); 
         return params;
       });
     }
-    setChecked(newValues);
   };
   useEffect(() => {
     const fetchInstructorsName = async () => {
@@ -62,47 +72,43 @@ export default function InstructorsFilter() {
     fetchInstructorsName();
   }, [searchParams]);
   useEffect(() => {
+    // Initialize checked state from URL search params
     const checkedValues = searchParams.getAll("instructor");
     const checkBoxes = {};
     items.forEach(
       (item) => (checkBoxes[item.id] = checkedValues.includes(item.id))
     );
     setChecked(checkBoxes);
+    // Set personName state from URL params for controlled Select
+    setPersonName(checkedValues);
   }, [items, searchParams]);
   return (
-    <Accordion
-      sx={{
-        width: "100%",
-        border: 0,
-        borderRadius: 0,
-        boxShadow: 0,
-        "&:before": { backgroundColor: "transparent" },
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ArrowDropDownIcon />}
-        aria-controls="panel2-content"
-        id="panel2-header"
-      >
-        <Typography component="span">instructors</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <FormGroup>
-          {items.map((item) => (
-            <FormControlLabel
-              key={item?.id}
-              control={
-                <Checkbox
-                  checked={!!checked[item.id]}
-                  onChange={handleChange}
-                  name={item.id}
-                />
-              }
-              label={`${item.first_name} ${item.last_name}`}
-            />
+    <div>
+      <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="demo-multiple-checkbox-label">Instructors</InputLabel>
+        <Select
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={personName} // Array of selected category_ids
+          onChange={handleChange}
+          input={<OutlinedInput label="Instructors" />}
+          renderValue={(selected) =>
+            selected
+              .map((instructorId) => items.find((item) => item.id === instructorId)?.first_name || instructorId)
+              .join(", ")
+          }
+          MenuProps={MenuProps}
+          name="categories"
+        >
+          {items?.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              <Checkbox checked={personName.includes(item.id)} />
+              <ListItemText primary={`${item?.first_name} ${item?.last_name}`} />
+            </MenuItem>
           ))}
-        </FormGroup>
-      </AccordionDetails>
-    </Accordion>
+        </Select>
+      </FormControl>
+    </div>
   );
 }

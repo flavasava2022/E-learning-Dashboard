@@ -10,9 +10,11 @@ import HeaderDashboard from "../../ui/HeaderDashboard";
 
 import { Outlet } from "react-router";
 import { Container } from "@mui/material";
+import { useSidebar } from "../../../context/SidebarContext";
 
 export default function DashboardLayout() {
   const dispatch = useDispatch();
+    const { isOpen } = useSidebar();
   const { user, role } = useSelector((state) => state.auth);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   useEffect(() => {
@@ -26,7 +28,10 @@ export default function DashboardLayout() {
       ) : (
         <DesktopNavDashboard role={role} />
       )}
-      <div className="flex flex-col md:px-4 gap-4 flex-grow max-w-[100%] min-w-0">
+      <div
+        className="flex flex-col md:px-4 gap-4 flex-grow  min-w-0"
+        style={{ width: isOpen?"calc(100% - 250px)":'100%' }}
+      >
         <HeaderDashboard />
         <div className="h-full w-full overflow-y-auto pt-4 p-1">
           {" "}

@@ -35,10 +35,8 @@ export default function SearchBtn({ setPage }) {
       onChange={(e) => setSearch(e.target.value)}
       onKeyDown={handleKeyPress}
       sx={{
-        borderRadius: 12,
-        padding: "0 12px",
-        height: "40px",
-        maxWidth: "600px",
+        width: "350px",
+        height:'54px'
       }}
       endAdornment={
         <IconButton

@@ -8,7 +8,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import Pagination from "@mui/material/Pagination"; 
+import Pagination from "@mui/material/Pagination";
 import ViewHeadlineIcon from "@mui/icons-material/ViewHeadline";
 import GridViewIcon from "@mui/icons-material/GridView";
 
@@ -18,15 +18,17 @@ import { useState } from "react";
 import DesktopFilters from "../../../components/ui/DesktopFilters";
 import { useMediaQuery } from "react-responsive";
 import SearchBtn from "../../../components/common/SearchBtn";
+import CategoriesSelector from "../components/CategoriesSelector";
+import CategoriesFilter from "../../../components/ui/CategoriesFilter";
+import InstructorsFilter from "../../../components/ui/InstructorsFilter";
 
 export default function CoursesListPage() {
-
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const [openFilters, setOpenFilters] = useState(false);
   const [alignment, setAlignment] = useState("grid");
 
   const [page, setPage] = useState(1);
-  const pageSize = 8;
+  const pageSize = 10;
 
   const handleAlignment = (event, newAlignment) => {
     setAlignment(newAlignment);
@@ -47,21 +49,28 @@ export default function CoursesListPage() {
     <div className="flex  justify-between gap-4 w-full h-full">
       {isMobile ? (
         <Filters openFilters={openFilters} setOpenFilters={setOpenFilters} />
-      ) : (
-        <DesktopFilters />
-      )}
-      <div className="flex flex-col items-center  flex-grow gap-2 h-full">
+      ) : null}
+      <div className="flex flex-col items-center    gap-2 h-full w-full">
         <Box className="sticky flex items-center justify-between w-full gap-2">
-          <IconButton
-            sx={{ display: { xs: "block", sm: "none" } }}
-            edge="start"
-            color="primary"
-            aria-label="open filter drawer"
-            onClick={() => setOpenFilters(true)}
-          >
-            <FilterAltIcon />
-          </IconButton>
-          <SearchBtn setPage={setPage} />
+          <Box sx={{ display: "flex", gap: 2,justifyContent:'center',alignItems:'center' }}>
+            <IconButton
+              sx={{ display: { xs: "block", sm: "none" } }}
+              edge="start"
+              color="primary"
+              aria-label="open filter drawer"
+              onClick={() => setOpenFilters(true)}
+            >
+              <FilterAltIcon />
+            </IconButton>
+
+            <SearchBtn setPage={setPage} />
+            {!isMobile && (
+              <>
+                <CategoriesFilter />
+                <InstructorsFilter />
+              </>
+            )}
+          </Box>
           <ToggleButtonGroup
             value={alignment}
             exclusive
@@ -94,30 +103,33 @@ export default function CoursesListPage() {
             height: "100%",
             paddingTop: "8px",
             paddingBottom: "8px",
-            width:'100%',
-   
+            width: "100%",
           }}
         >
           {loading ? (
-            <Grid item xs={12} display="flex" justifyContent="center" alignItems='center' sx={{width:'100%',height:'100%'}}>
+            <Grid
+              
+
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ width: "100%", height: "100%" }}
+            >
               <CircularProgress />
             </Grid>
           ) : (
             paginatedData.map((course) => (
               <Grid
-                item
+                
                 key={course.id}
-
                 sx={{
                   width: alignment === "list" ? "98%" : "fit-content",
                   border: "1px solid #e0e0e0",
                   borderRadius: 3,
-                  height:'fit-content'
+                  height: "fit-content",
                 }}
-                xs={12}
-                sm={alignment === "grid" ? 6 : 12}
-                md={alignment === "grid" ? 4 : 12}
-                lg={alignment === "grid" ? 3 : 12}
+
+
               >
                 <CourseCard id={course.id} alignment={alignment} />
               </Grid>
