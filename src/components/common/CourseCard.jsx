@@ -18,7 +18,7 @@ import StarIcon from "@mui/icons-material/Star";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import ImportContactsIcon from "@mui/icons-material/ImportContacts";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import { useNavigate } from "react-router";
 export default function CourseCard({ id, alignment, page = "courses" }) {
@@ -61,7 +61,7 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
       if (error) {
         console.error(error);
       } else {
-        setCourse(data[0] || []); 
+        setCourse(data[0] || []);
       }
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
         flexDirection: isList ? { xs: "column", sm: "row" } : "column",
         width: isList ? "100%" : "280px",
 
-        height: isList ? "fit-content" : "380px", 
+        height: isList ? "fit-content" : "380px",
         boxShadow: 3,
         p: 2,
         position: "relative",
@@ -102,7 +102,7 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
           color: "white",
           zIndex: 2,
           transition: "opacity 0.3s ease-in-out",
-          borderRadius: "inherit", 
+          borderRadius: "inherit",
           p: 2,
           flexDirection: "column",
           justifyContent: "space-between",
@@ -137,7 +137,12 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
               height: isList ? { xs: 180, sm: "auto" } : 160,
               borderRadius: 2,
               objectFit: "cover",
-              flexShrink: 0, 
+              flexShrink: 0,
+            }}
+            onError={(event) => {
+              event.target.onerror = null; // Prevent looping if fallback also fails
+              event.target.src =
+                "https://via.placeholder.com/200x160?text=No+Image"; // Fallback image URL
             }}
           />
           {/* --- CARD CONTENT (VISIBLE) --- */}
@@ -200,7 +205,6 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
                 justifyContent: "space-between",
                 flexDirection: { xs: "column", md: "row" },
                 gap: 2,
-                
               }}
             >
               {page !== "mycourses" && (
@@ -214,7 +218,7 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
                 <div className="flex items-center justify-between gap-2">
                   <Button
                     onClick={() =>
-                    Navigate(`/dashboard/mycourses/create/${course.id}`)
+                      Navigate(`/dashboard/mycourses/create/${course.id}`)
                     }
                     variant="contained"
                     size="small"
@@ -229,13 +233,17 @@ export default function CourseCard({ id, alignment, page = "courses" }) {
                     View Details
                   </Button>
                 </div>
-              ) :                isList&&   <Button
+              ) : (
+                isList && (
+                  <Button
                     variant="contained"
                     size="small"
                     onClick={() => Navigate(`/dashboard/courses/${course.id}`)}
                   >
                     View Details
-                  </Button>}
+                  </Button>
+                )
+              )}
             </CardActions>
           </Box>
           {/* --- OVERLAY (GRID VIEW ONLY) --- */}

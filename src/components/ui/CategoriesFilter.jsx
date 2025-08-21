@@ -1,66 +1,78 @@
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import {
+  Checkbox,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { useSearchParams } from "react-router";
 import { supabase } from "../../utils/supabase";
 
+const ITEM_HEIGHT = 40;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 export default function CategoriesFilter() {
   const [items, setItems] = useState([]);
   const [checked, setChecked] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
+  const [personName, setPersonName] = useState([]);
 
   const handleChange = (event) => {
-    const newValues = {
-      ...checked,
-      [event.target.name]: event.target.checked,
-    };
-    const categories = Object.keys(newValues).filter(
-      (key) => newValues[key] === true
-    );
-    if (categories.length > 0) {
+    const { value } = event.target;
+    setPersonName(typeof value === "string" ? value.split(",") : value);
+
+    // Update URL search params with selected categories (IDs)
+    if (value.length > 0) {
       setSearchParams((current) => {
         const params = new URLSearchParams(current);
         params.delete("categories"); // Remove previous values
-
-        // Add each category as its own query param
-        categories.forEach((category) => {
-          params.append("categories", category);
+        // Add each selected category ID as individual query param
+        value.forEach((categoryId) => {
+          params.append("categories", categoryId);
         });
         return params;
       });
     } else {
       setSearchParams((current) => {
         const params = new URLSearchParams(current);
-        params.delete("categories");
+        params.delete("categories"); // Clear categories param if none selected
         return params;
       });
     }
-    setChecked(newValues);
   };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data, error } = await supabase
           .from("categories")
           .select("name,category_id");
-
         if (error) throw error;
         if (data) {
           setItems(data || []);
         }
       } catch (err) {
-        console.error("Error fetching courses:", err);
+        console.error("Error fetching categories:", err);
       }
     };
 
     fetchCategories();
   }, []);
+
   useEffect(() => {
+    // Initialize checked state from URL search params
     const checkedValues = searchParams.getAll("categories");
     const checkBoxes = {};
     items.forEach(
@@ -70,42 +82,40 @@ export default function CategoriesFilter() {
         ))
     );
     setChecked(checkBoxes);
+    // Set personName state from URL params for controlled Select
+    setPersonName(checkedValues);
   }, [items, searchParams]);
 
   return (
-    <Accordion
-      sx={{
-        width: "100%",
-        border: 0,
-        borderRadius: 0,
-        boxShadow: 0,
-        "&:before": { backgroundColor: "transparent" },
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ArrowDropDownIcon />}
-        aria-controls="panel2-content"
-        id="panel2-header"
-      >
-        <Typography component="span">Categories</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <FormGroup>
-          {items.map((item) => (
-            <FormControlLabel
-              key={item.name}
-              control={
-                <Checkbox
-                  checked={!!checked[item.category_id]}
-                  onChange={handleChange}
-                  name={item.category_id}
-                />
-              }
-              label={item.name}
-            />
+    <div>
+      <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="demo-multiple-checkbox-label">categories</InputLabel>
+        <Select
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={personName} // Array of selected category_ids
+          onChange={handleChange}
+          input={<OutlinedInput label="categories" />}
+          renderValue={(selected) => {
+            return selected
+              .map(
+                (id) =>
+                  items.find((item) => item.category_id === id)?.name || id
+              )
+              .join(", ");
+          }}
+          MenuProps={MenuProps}
+          name="categories"
+        >
+          {items?.map((item) => (
+            <MenuItem key={item.category_id} value={item.category_id}>
+              <Checkbox checked={personName.includes(item.category_id)} />
+              <ListItemText primary={item.name} />
+            </MenuItem>
           ))}
-        </FormGroup>
-      </AccordionDetails>
-    </Accordion>
+        </Select>
+      </FormControl>
+    </div>
   );
 }
